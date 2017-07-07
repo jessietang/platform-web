@@ -1,0 +1,41 @@
+/*==定义一些混合宏==*/
+@charset "UTF-8";
+// 将px转为rem
+@mixin pxrem($property, $px-values) {
+  @if type-of($px-values) == "number"{
+    #{$property}: $px-values / 75 * 1rem;
+  }
+  @else {
+    $rem-values:();
+    @each $value in $px-values{
+      @if $value == 0 or type-of($value) != "number"{
+        $rem-values: append($rem-values, $value);
+      }
+      @else{
+        $rem-values: append($rem-values, $value / 75 * 1rem);
+      }
+    }
+    #{$property}: $rem-values;
+  }
+}
+
+/*change the default color of input placeholder*/
+@mixin input-placeholder-color($color-value){
+  :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color: $color-value;
+  }
+
+  ::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color: $color-value;
+  }
+
+  input:-ms-input-placeholder,
+  textarea:-ms-input-placeholder {
+    color: $color-value;
+  }
+
+  input::-webkit-input-placeholder,
+  textarea::-webkit-input-placeholder {
+    color: $color-value;
+  }
+}

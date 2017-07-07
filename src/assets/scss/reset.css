@@ -1,0 +1,96 @@
+@charset 'UTF-8';
+html, body {
+  height: 100%;
+}
+body {
+  font: 400 .14rem '\5FAE\8F6F\96C5\9ED1', Helvetica;
+  font-size: .14rem;
+  color: #000;
+  -webkit-overflow-scrolling: touch;
+  background-color: #fff;
+}
+body, div, dl, dt, dd, del, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, textarea, p, blockquote, th, td, a, menu, header {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  word-break:break-all;
+}
+input, textarea {
+  border: 0;
+}
+select {
+  box-sizing: border-box;
+  white-space: pre;
+  align-items: center;
+  -webkit-rtl-ordering: logical;
+}
+table {
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+fieldset, img {
+  vertical-align: top;
+  border: 0;
+}
+address, caption, cite, code, dfn, em, th, var {
+  font-weight: 400;
+  font-style: normal;
+}
+ol, ul, li {
+  list-style: none;
+}
+caption, th {
+  text-align: left;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-size: 100%;
+  font-weight: 400;
+  font-style: normal;
+}
+q:before, q:after {
+  content: '';
+}
+abbr, acronym {
+  border: 0;
+}
+header, section, footer {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+a {
+  text-decoration: none;
+  color: #000;
+}
+a, img {
+  -webkit-touch-callout: none; /*禁止长按链接与图片弹出菜单*/
+}
+html, body {
+  -webkit-user-select: none; /*禁止选中文本*/
+  user-select: none;
+  width: 10rem;
+  margin: 0 auto;
+}
+button, input, optgroup, select, textarea {
+  -webkit-appearance: none; /*去掉webkit默认的表单样式*/
+  border:none;
+  outline: none;
+}
+a, button, input, optgroup, select, textarea {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0); /*去掉a、input和button点击时的蓝色外边框和灰色半透明背景*/
+}
+body {
+  -webkit-text-size-adjust: 100% !important; /*禁止IOS调整字体大小*/
+}
+input::-webkit-input-speech-button {
+  display: none; /*隐藏Android的语音输入按钮*/
+}
+input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill{
+  box-shadow:inset 0 0 0 1000px #fff; /* 使用box-shadow改变(挡住)表单自动填充后的黄色 */
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+}

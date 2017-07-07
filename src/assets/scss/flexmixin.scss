@@ -6,28 +6,26 @@
   display: flex;
 }
 
-// 以下属性设置在容器上
-
-// 1.主轴方向，项目排列方向
-%fxd-r { // 主轴为水平方向，起点在左端
+//常用样式
+%flex-center{
+  display: flex;
   flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
-%fxd-rr { // 主轴为水平方向，起点在右端
-  flex-direction: row-reverse;
+%flex-left{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: left;
 }
 
-%fxd-c { // 主轴为垂直方向，起点在上沿
+%flex-center-column{
+  display: flex;
   flex-direction: column;
-}
-
-%fxd-cr { // 主轴为垂直方向，起点在下沿
-  flex-direction: column-reverse;
-}
-
-// 2.一条轴线排不下，是否换行
-%fxw-n { // 不换行
-  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
 }
 
 
