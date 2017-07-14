@@ -98,7 +98,8 @@
           geolocation.getCurrentPosition(function(r){
             if(this.getStatus() == BMAP_STATUS_SUCCESS){
               // Icon类表示覆盖物所使用的图标
-              var myIcon = new BMap.Icon('../../../static/img/local.png',new BMap.Size(137,62));
+              //var myIcon = new BMap.Icon('./static/img/local.png',new BMap.Size(137,62));
+              var myIcon = new BMap.Icon('./static/img/local.png',new BMap.Size(137,62));
               // Marker类表示地图上一个图像标注
               var marker = new BMap.Marker(r.point,{icon:myIcon});
               //添加一个覆盖物
@@ -183,7 +184,7 @@
           for (let i in nearData) {
             var option = nearData[i].option;
             console.log(option);
-            var myIcon = new BMap.Icon("../../../static/img/nearCar.png", new BMap.Size(36,36));// 搜索到的车辆定位图标
+            var myIcon = new BMap.Icon("./static/img/nearCar.png", new BMap.Size(36,36));// 搜索到的车辆定位图标
             let marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
             _this.map.addOverlay(marker);
 
@@ -267,7 +268,7 @@
               }
             };
             var option = data.option;
-            var myIcon = new BMap.Icon("../../../static/img/resultCar.png", new BMap.Size(22,33));// 搜索到的车辆定位图标
+            var myIcon = new BMap.Icon("./static/img/resultCar.png", new BMap.Size(22,33));// 搜索到的车辆定位图标
             var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
             _this.map.addOverlay(marker);
             _this.map.centerAndZoom(new BMap.Point(option.lng,option.lat), 16);
@@ -322,7 +323,7 @@
                  }
                };
                var option = data.option;
-               var myIcon = new BMap.Icon("../../../static/img/resultCar.png", new BMap.Size(22,33));// 搜索到的车辆定位图标
+               var myIcon = new BMap.Icon("./static/img/resultCar.png", new BMap.Size(22,33));// 搜索到的车辆定位图标
                var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
                _this.map.addOverlay(marker);
                _this.map.centerAndZoom(new BMap.Point(option.lng,option.lat), 16);
@@ -402,7 +403,7 @@
             //显示小车子
             // Label此类表示地图上的文本标注
             label = new BMap.Label("", {offset: new BMap.Size(10, -30)});
-            var myIcon = new BMap.Icon("../../../static/img/nearCar.png", new BMap.Size(36,36));// 搜索到的车辆定位图标
+            var myIcon = new BMap.Icon("./static/img/nearCar.png", new BMap.Size(36,36));// 搜索到的车辆定位图标
             car = new BMap.Marker(points[0], {icon: myIcon}); // 创建Marker实例
             car.setLabel(label); // 为标注添加文本标注
             _this.map.addOverlay(car);
@@ -427,7 +428,7 @@
                   '<tr><td>定位时间：</td><td>' + data[index].GPSDateCvt + '</td></tr>' +
                   '<tr><td>接收时间：</td><td>' + data[index].receiveDate + '</td></tr>' +
                   "</table></div>";
-                var myIcon2 = new BMap.Icon("../../../static/img/bullet.png", new BMap.Size(12,12));// 搜索到的车辆定位图标
+                var myIcon2 = new BMap.Icon("./static/img/bullet.png", new BMap.Size(12,12));// 搜索到的车辆定位图标
                 var marker = new BMap.Marker(points[index], {icon: myIcon2}); // 创建Marker实例
                 _this.map.addOverlay(marker);
                 // 给轨迹上的每一个点绑定点击开启信息窗口的事件

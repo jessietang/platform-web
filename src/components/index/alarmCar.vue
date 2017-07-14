@@ -53,7 +53,7 @@
           geolocation.getCurrentPosition(function(r){
             if(this.getStatus() == BMAP_STATUS_SUCCESS){
               // Icon类表示覆盖物所使用的图标
-              var myIcon = new BMap.Icon('../../../static/img/local.png',new BMap.Size(137,62));
+              var myIcon = new BMap.Icon('./static/img/local.png',new BMap.Size(137,62));
               // Marker类表示地图上一个图像标注
               var marker = new BMap.Marker(r.point,{icon:myIcon});
               //添加一个覆盖物
@@ -133,7 +133,7 @@
           for (var i in nearData) {
             var option = nearData[i].option;
             console.log(option);
-            var myIcon = new BMap.Icon("../../../static/img/alarmCar.png", new BMap.Size(24,24));// 搜索到的车辆定位图标
+            var myIcon = new BMap.Icon("./static/img/alarmCar.png", new BMap.Size(24,24));// 搜索到的车辆定位图标
             var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
             _this.map.addOverlay(marker);
             var html = '<div class="map-info-win"><table>' +
@@ -192,7 +192,7 @@
               }
             };
             var option = data.option;
-            var myIcon = new BMap.Icon("../../../static/img/resultCar.png", new BMap.Size(22,33));// 搜索到的车辆定位图标
+            var myIcon = new BMap.Icon("./static/img/resultCar.png", new BMap.Size(22,33));// 搜索到的车辆定位图标
             var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
             _this.map.addOverlay(marker);
             _this.map.centerAndZoom(new BMap.Point(option.lng,option.lat), 16);
@@ -250,7 +250,7 @@
              }
              };
              var option = data.option;
-             var myIcon = new BMap.Icon("../../../static/img/resultCar.png", new BMap.Size(22,33));// 搜索到的车辆定位图标
+             var myIcon = new BMap.Icon("./static/img/resultCar.png", new BMap.Size(22,33));// 搜索到的车辆定位图标
              var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
              _this.map.addOverlay(marker);
              _this.map.centerAndZoom(new BMap.Point(option.lng,option.lat), 16);

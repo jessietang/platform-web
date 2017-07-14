@@ -60,19 +60,19 @@
       methods: {
         getZhuType (zhuType) {
           if (zhuType) {
-            return '../../../static/img/linkTong.png'
+            return './static/img/linkTong.png'
           } else {
-            return '../../../static/img/linkDuan.png'
+            return './static/img/linkDuan.png'
           }
-          return '../../../static/img/linkTong.png'
+          return './static/img/linkTong.png'
         },
         getCongType (congType) {
           if (congType) {
-            return '../../../static/img/linkTong.png'
+            return './static/img/linkTong.png'
           } else {
-            return '../../../static/img/linkDuan.png'
+            return './static/img/linkDuan.png'
           }
-          return '../../../static/img/linkTong.png'
+          return './static/img/linkTong.png'
         },
         goDetail (index) {
           this.$router.push({
