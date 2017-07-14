@@ -14,8 +14,8 @@
   width: 100%;
   @include pxrem(margin-top, 40);
   @include pxrem(height, 70);
-  @include pxrem(font-size,30);
-  @include pxrem(padding, 22 0);
+  @include pxrem(font-size,32);
+  /*@include pxrem(padding, 22 0);*/
   border-bottom: 1px solid #eee;
 }
 

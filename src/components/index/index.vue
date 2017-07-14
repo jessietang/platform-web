@@ -1,13 +1,13 @@
 <template lang="html">
     <div id="index">
       <!--<p class="title">地图操作</p>-->
-      <div class="nearCar" :class="{'tabActive': $route.path.indexOf('/nearCar')}">
-        <router-link to="/index/nearCar">
+      <div class="nearCar" :class="{'tabActive': $route.path.indexOf('/nearCar') !== -1}">
+        <router-link to="/web/index/nearCar">
           <p class="text">附近</p>
         </router-link>
       </div>
-      <div class="alarmCar" :class="{'tabActive': $route.path.indexOf('/alarmCar')}">
-        <router-link to="/index/alarmCar">
+      <div class="alarmCar" :class="{'tabActive': $route.path.indexOf('/alarmCar') !== -1}">
+        <router-link to="/web/index/alarmCar">
           <p class="text">报警</p>
         </router-link>
       </div>
@@ -66,7 +66,7 @@
       @include pxrem(top, 200);
 
       a {
-        background: url('./img/magnify.png') no-repeat;
+        background: url('./img/near.png') no-repeat;
         @include pxrem(background-position, 20 8);
         @include pxrem(background-size, 40 40);
       }
@@ -76,7 +76,7 @@
       @include pxrem(top, 310);
 
       a {
-        background: url('./img/magnify.png') no-repeat;
+        background: url('./img/alarm.png') no-repeat;
         @include pxrem(background-position, 20 8);
         @include pxrem(background-size, 40 40);
       }
@@ -93,7 +93,7 @@
 
     .alarmCar.tabActive {
       a {
-        background: url('./img/magnify.png') no-repeat;
+        background: url('./img/alarmActive.png') no-repeat;
         @include pxrem(background-position, 20 8);
         @include pxrem(background-size, 40 40);
       }

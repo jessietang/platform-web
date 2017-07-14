@@ -10,80 +10,64 @@
 
       <div class="modularBottom">
         <div class="modularEchartBox">
-          <div id="modularReport"></div>
+          <div class="zx-zg">
+            <div class="zx">
+              <p class="text">在线平台数</p>
+              <p class="num">{{zxNum}}</p>
+            </div>
+            <div class="zg">
+              <p class="text">在岗平台数</p>
+              <p class="num">{{zgNum}}</p>
+            </div>
+          </div>
+          <!--平台总数-->
+          <div class="allNum">
+            平台总数：<span class="platformAll">{{platformAll}}</span>
+          </div>
         </div>
       </div>
     </div>
 </template>
 <script lang="babel">
-    import echarts from 'echarts'
+    import {mapState} from 'vuex'
     import axios from 'axios'
     export default {
       data () {
         return {
-          chart: null,
-          opinion: ['正常在线平台数','断线平台数','从链路短线数'],
-          opinionData: [
-            {value:21, name:'正常在线平台数'},
-            {value:4, name:'断线平台数'},
-            {value:2, name:'从链路短线数'}
-          ],
-          platFormNum: 27 // 接入平台总数
+          zxNum: 0, // 在线平台数
+          zgNum: 0, // 在岗平台数
+          platformAll: 0 // 平台总数
         }
       },
+      computed: {
+        ...mapState([
+          'userInfo'
+        ])
+      },
       methods: {
-        // 图表绘制
-        drawPie (id) {
-          this.chart = echarts.init(document.getElementById(id))
-          /*let data = {
-           userId: 192,
-           dataType: 'json'
-           }
-           // 这里发请求得到data
-           axios.get('/activity/findTop100UserPrizes', data).then(res => {
-           if (res.data.code === 0) {
-           let opinionData = res.data.data
-           this.opinionData = opinionData
-           }
-           }).catch(error => {
-           console.log(error)
-           })*/
-          this.chart.setOption({
-            title: {
-              text: "接入平台总数: " + this.platFormNum,
-              x: 'center',
-              y: '50%',
-              offsetCenter:['50%', '50%'],
-              textStyle: {
-                color: '#000',
-                fontSize: 10,
-                fontWeight: 'lighter'
-              }
-            },
-            tooltip: {
-              trigger: 'item',
-              formatter: "{a} <br/>{b}: {c} ({d}%)"
-            },
-            legend: {
-              orient: 'horizontal',
-              x: 'left',
-              data: this.opinion
-            },
-            series: [
-              {
-                name:'接入平台链接情况',
-                type:'pie',
-                center:	['50%', '50%'],
-                radius: ['45%', '65%'],
-                data: this.opinionData,
-              }
-            ]
+        // 获取页面要展示的数据
+        initData () {
+          var _this = this;
+          // 参数： userId
+          var postData = {
+            userId: _this.userInfo.userId
+          };
+          axios.get('',postData).then(res => {
+            var zxNum  = 110;
+            var zgNum = 119;
+            var platformAll = 3456;
+            _this.zxNum = zxNum;
+            _this.zgNum = zgNum;
+            _this.platformAll = platformAll;
+          }).catch(error => {
+            console.log(error);
           })
         }
+
       },
       mounted () {
         this.$nextTick(function(){
-          this.drawPie('modularReport')
+          this.initData();
         })
       }
     }
@@ -141,10 +125,42 @@
         @include pxrem(height,468);
         @include pxrem(margin, 150 auto 86 -330);
         background: rgba(255,255,255,.5);
+        color: #21a0fa;
 
-        #modularReport {
+        .zx-zg {
           width: 100%;
-          height: 100%;
+          @include pxrem(height, 300);
+          @extend %flex-center;
+
+          .zx {
+            border-right: 1px solid #eee;
+          }
+          .zx, .zg {
+            width: 50%;
+            height: 100%;
+            text-align: center;
+
+            .text {
+              @include pxrem(font-size, 30);
+              @include pxrem(height, 100);
+              @include pxrem(line-height, 100);
+            }
+            .num {
+              @include pxrem(font-size, 50);
+              @include pxrem(height, 200);
+              @include pxrem(line-height, 200);
+              font-weight: bold;
+            }
+          }
+        }
+
+        .allNum {
+          width: 100%;
+          @include pxrem(height, 168);
+          @include pxrem(line-height, 168);
+          border-top: 1px solid #eee;
+          @include pxrem(font-size, 30);
+          text-align: center;
         }
       }
     }

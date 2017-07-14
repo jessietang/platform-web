@@ -87,7 +87,7 @@
        }
 
       a:nth-child(4) .navBarList.activeRouter {
-        background: url('./img/routerActive3.png') no-repeat center center;
+        background: url('./img/routerActive4.png') no-repeat center center;
         @include pxrem(background-size, 50 50);
       }
     }

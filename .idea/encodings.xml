@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/package.json" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/App.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/assets/js/common/common.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/assets/js/common/config.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/assets/js/common/index.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/assets/js/common/storage.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/assets/scss/base.scss" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/assets/scss/mixin.scss" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/assets/scss/reset.css" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/assets/test.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/Hello.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/index/alarmCar.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/index/carPosition.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/index/carTrail.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/index/index.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/index/nearCar.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/index/searchCar.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/info/changePass.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/info/index.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/login/login.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/module/index.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/navBar/navBar.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/report/analysis.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/report/index.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/report/platformDetail.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/report/sixStrictBan.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/report/supervision.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/report/zxDetail.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/components/web/index.vue" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/router/index.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/store/index.js" charset="UTF-8" />
+  </component>
+</project>

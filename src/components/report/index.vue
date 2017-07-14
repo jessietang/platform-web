@@ -3,13 +3,13 @@
       <!--<p class="title">图形化报表</p>-->
       <ul class="tab clearfix">
         <li class="tab-list" :class="{'activeTab': $route.path === '/web/report/analysis'}">
-          <router-link to="/report/analysis">接入平台监管</router-link>
+          <router-link to="/web/report/analysis">接入平台监管</router-link>
         </li>
         <li class="tab-list" :class="{'activeTab': $route.path === '/web/report/sixStrictBan'}">
-          <router-link to="/report/sixStrictBan">在线情况</router-link>
+          <router-link to="/web/report/sixStrictBan">在线情况</router-link>
         </li>
         <li class="tab-list" :class="{'activeTab': $route.path === '/web/report/supervision'}">
-          <router-link to="/report/supervision">违章情况</router-link>
+          <router-link to="/web/report/supervision">报警督办统计</router-link>
         </li>
       </ul>
       <router-view></router-view>

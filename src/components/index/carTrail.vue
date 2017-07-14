@@ -4,7 +4,7 @@
         <ul class="time">
           <div class="block">
             <span class="bluePoint col-xs-hidden"></span>
-            <span class="demonstration col-xs-hidden">开始时间</span>
+            <span class="demonstration ">开始时间</span>
             <el-date-picker
               v-model="startTime"
               type="datetime"
@@ -16,7 +16,7 @@
 
           <div class="block">
             <span class="orangePoint col-xs-hidden"></span>
-            <span class="demonstration col-xs-hidden">结束时间</span>
+            <span class="demonstration ">结束时间</span>
             <el-date-picker
               v-model="endTime"
               type="datetime"
@@ -27,15 +27,19 @@
           </div>
         </ul>
         <div class="search">
-          <div class="resetTime" @click="resetTime()">
-            <img src="./img/magnify.png" alt=""/>
+          <div class="resetTime" @click="copyTime()">
+            <img src="./img/copy.png" alt=""/>
           </div>
-          <div class="searchTrail">搜索</div>
+          <div class="searchTrail" @click="searchHistoryTrail()">搜索</div>
         </div>
       </div>
+
+      <!--tips-->
+      <div class="tips" v-if="tipShow">{{tips}}</div>
     </div>
 </template>
 <script lang="babel">
+  import {mapState} from 'vuex'
     export default {
       data () {
         return {
@@ -65,14 +69,154 @@
               }
             ]
           },
-          startTime: '', // 开始时间
-          endTime: '' // 结束时间
+          isShow: true,
+          startTime: new Date(), // 开始时间 默认时间为当前时间
+          endTime: new Date(), // 结束时间 默认时间为当前时间
+          tips: '',
+          tipShow: false
         }
       },
+      created () {
+        console.log(this.startTime);
+      },
+      computed: {
+        ...mapState([
+          'carDetail',
+          'userInfo'
+        ])
+      },
       methods: {
-        resetTime () {
-          this.startTime = '';
-          this.endTime = '';
+        // 把第一个input框时间copy到第二个框
+        copyTime () {
+          this.endTime = this.startTime;
+        },
+        searchHistoryTrail () {
+          var _this = this;
+          if (_this.startTime !== '' && _this.endTime !== '') {
+            if (_this.startTime.getTime() > _this.endTime.getTime()) {
+              _this.tipShow = true;
+              _this.tips = '开始日期不能晚于结束日期！';
+              setTimeout(function(){
+                _this.tipShow = false;
+              }, 1000);
+            } else if (_this.endTime.getTime() - _this.startTime.getTime() > 2 * 24 * 3600 * 1000) {
+              _this.tipShow = true;
+              _this.tips = '前后日期相差大于两天！';
+              setTimeout(function(){
+                _this.tipShow = false;
+              }, 1000);
+            }else {
+              // 发请求
+              var sd = _this.formatDate(_this.startTime); // 开始日期
+              var st = _this.formateTime(_this.startTime); // 开始时间
+              console.log(sd);
+              console.log(st);
+              var ed = _this.formatDate(_this.endTime); // 结束日期
+              var et = _this.formateTime(_this.endTime); // 开始时间
+              console.log(ed);
+              console.log(et);
+
+              // 参数：车辆ID、开始日期、开始时间、结束日期、结束时间、用户ID
+              var postData = {
+                carId: _this.carDetail.carId,
+                userId: _this.userInfo.userId,
+                startDate: sd,
+                startTime: st,
+                endDate: ed,
+                endTime: et
+              };
+
+              // 无历史轨迹数据
+              /*_this.tipShow = true;
+              _this.tips = '无历史轨迹数据！';
+              setTimeout(function(){
+                _this.tipShow = false;
+              }, 1000);*/
+
+              // 有历史轨迹数据
+              _this.isShow = false;
+              var trackData = [
+                {
+                  lng: 114.00100,
+                  lat: 22.550000,
+                  location: '成都市双流县航空港',
+                  direction: '正北方向',
+                  SpeedCvt: "60",
+                  LimitSpeed: "40",
+                  GPSDateCvt: "2017-7-13 13:53:12",
+                  receiveDate: "2017-7-13 13:53:30"
+                },
+                {
+                  lng: 114.00130,
+                  lat: 22.550000,
+                  location: '成都市双流县航空港',
+                  direction: '正北方向',
+                  SpeedCvt: "60",
+                  LimitSpeed: "40",
+                  GPSDateCvt: "2017-7-13 14:10:12",
+                  receiveDate: "2017-7-13 14:10:30"
+                },
+                {
+                  lng: 114.00160,
+                  lat: 22.550000,
+                  location: '成都市双流县航空港',
+                  direction: '正北方向',
+                  SpeedCvt: "60",
+                  LimitSpeed: "40",
+                  GPSDateCvt: "2017-7-13 15:20:12",
+                  receiveDate: "2017-7-13 15:20:30"
+                },
+                {
+                  lng: 114.00510,
+                  lat: 22.550000,
+                  location: '成都市双流县航空港',
+                  direction: '正北方向',
+                  SpeedCvt: "60",
+                  LimitSpeed: "40",
+                  GPSDateCvt: "2017-7-13 16:53:12",
+                  receiveDate: "2017-7-13 16:53:30"
+                },
+                {
+                  lng: 114.00537,
+                  lat: 22.549500,
+                  location: '成都市双流县航空港',
+                  direction: '正北方向',
+                  SpeedCvt: "60",
+                  LimitSpeed: "40",
+                  GPSDateCvt: "2017-7-13 17:34:12",
+                  receiveDate: "2017-7-13 13:34:30"
+                }
+              ];
+              _this.$emit('drawTrack', trackData, _this.isShow); // 触发父组件的自定义事件
+
+            }
+          } else {
+            _this.tipShow = true;
+            _this.tips = '请先选择时间！';
+            setTimeout(function(){
+              _this.tipShow = false;
+            }, 1000);
+          }
+
+        },
+        formatDate (time) {
+          var y = time.getFullYear();
+          var m = time.getMonth() + 1;
+          var d = time.getDate();
+          if (m < 10) {
+            m = '0' + m;
+          }
+          if (d < 10) {
+            d = '0' + d;
+          }
+          return y + '' + m + '' + d;
+        },
+        formateTime (time) {
+          var h = time.getHours();
+          var m = time.getMinutes();
+          var s = time.getSeconds();
+          var allS = h * 3600 + m * 60 + s;
+          return allS;
         }
       }
     }
@@ -80,16 +224,6 @@
 <style lang="scss" type="text/css">
   @import '../../assets/scss/mixin.scss';
   @import '../../assets/scss/flexmixin.scss';
-
-  @media screen and (max-width: 440px) {
-    .col-xs-hidden {
-      display: none!important;
-    }
-
-    .el-date-picker.has-sidebar.has-time {
-      min-width: 324px;
-    }
-  }
 
   #carTrail {
     @include pxrem(margin-top, 50);
@@ -134,7 +268,7 @@
       display: inline-block;
       @include pxrem(width, 16);
       @include pxrem(height, 16);
-      @include pxrem(margin-right, 15);
+      @include pxrem(margin-right, 5);
       @include pxrem(border-radius, 8);
       background-color: blue;
     }
@@ -143,15 +277,31 @@
       display: inline-block;
       @include pxrem(width, 16);
       @include pxrem(height, 16);
-      @include pxrem(margin-right, 15);
+      @include pxrem(margin-right, 5);
       @include pxrem(border-radius, 8);
       background-color: orange;
     }
 
   }
 
+  .tips {
+    position: absolute;
+    z-index: 10000;
+    top: -40%;
+    left: 50%;
+    @include pxrem(margin-left, -200);
+    @include pxrem(width,440);
+    @include pxrem(padding, 30 0);
+    background-color: rgba(0, 0, 0, 0.6);
+    @include pxrem(border-radius, 10);
+    text-align: center;
+    color: #fff;
+    @include pxrem(font-size,26);
+  }
+
   .demonstration {
     @include pxrem(margin-right, 20);
+    @include pxrem(font-size, 26);
   }
 
   .el-picker-panel__sidebar {
@@ -166,19 +316,46 @@
       left: 0;
       bottom: 0;
       z-index: 1000;
+      width: 50px;
     }
 
     .el-picker-panel__shortcut:nth-child(2) {
       left: 50px;
+
     }
 
     .el-picker-panel__shortcut:nth-child(3) {
       left: 100px;
+      width: 80px;
     }
   }
 
   .el-picker-panel [slot=sidebar]+.el-picker-panel__body, .el-picker-panel__sidebar+.el-picker-panel__body {
     margin-left: 0!important;
+  }
+
+  @media screen and (max-width: 440px) {
+    .col-xs-hidden {
+      display: none!important;
+    }
+
+    .el-date-picker.has-sidebar.has-time {
+      min-width: 324px;
+    }
+  }
+
+  @media screen and (max-width: 400px) {
+    #carTrail {
+      @include pxrem(margin-top, 0);
+    }
+
+    .el-date-editor.el-input.el-date-editor--datetime {
+      @include pxrem(margin-top, 10);
+    }
+
+    .block {
+      @include pxrem(padding, 5 0);
+    }
   }
 
 

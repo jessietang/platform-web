@@ -9,9 +9,12 @@ import 'element-ui/lib/theme-default/index.css'
 import axios from 'axios' // 引入axios请求
 import {fastclick} from './assets/js/common/index'
 fastclick(document.body) // fastclick用于消除在移动浏览器上触发click事件与一个物理Tap(敲击)之间的300s延迟
-window.axios = axios
 
+import './assets/js/common/config'
 import './assets/js/lib/flexible' // 通过js来动态改写meta标签
+
+window.axios = axios
+axios.defaults.baseURL = rootSrc.api // config.js里面配置
 
 Vue.use(ElementUi)
 
