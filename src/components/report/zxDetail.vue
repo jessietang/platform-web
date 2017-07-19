@@ -19,9 +19,10 @@
       data () {
         return {
           chart: null,
-          zxData: [200,100,102,123], // 在线数
-          rwData: [90,80,70,98], // 入网数
-          zsData: [300,200,400,900], // 车辆总数
+          zxData: [], // 在线数
+          rwData: [], // 入网数
+          zsData: [], // 车辆总数
+          xData: [],
           // 上个页面传递过来的值
           query: {}
         }
@@ -31,7 +32,8 @@
       },
       methods: {
         getQuery () {
-          this.query = this.$route.query
+          this.query = this.$route.query;
+          console.log(this.query);
         },
         goBack () {
           /*this.$router.push({
@@ -40,57 +42,95 @@
           this.$router.go(-1);
         },
         drawBar (id) {
-          this.chart = echarts.init(document.getElementById(id));
-          var dataId = this.query.dataId;
-          alert('接收到的值：'+dataId);
-          /*axios.get('',{}).then(res => {
+          var _this = this;
+          _this.chart = echarts.init(document.getElementById(id));
+          var dataId = _this.query.dataId;
+          var nowSelect = _this.query.nowSelect;
+          var userId = _this.query.userId;
+          // 参数：选择项id, 展示方式、用户id
+          var postData = {
+            dataId: dataId,
+            nowSelect: nowSelect,
+            userId: userId
+          };
+          axios.get('',postData).then(res => {
+            // 返回数据：选择项id、车辆类型、在线数、入网数、车辆总数
+            var res = {
+              "code": 0,
+              "data": [
+                {zId: 0, carType: '三类以上班线客车',zxNum: 200, rwNum: 90, zsNum: 300},
+                {zId: 0, carType: '旅游包车',zxNum: 100, rwNum: 80, zsNum: 200},
+                {zId: 0, carType: '危险品运输车',zxNum: 102, rwNum: 70, zsNum: 300},
+                {zId: 0, carType: '重型货运运输车',zxNum: 123, rwNum: 98, zsNum: 900}
+              ]
+            };
             if (res.code == 0) {
-              // do sth,
+              if (res.data.length > 0) { // 有数据
+                var data = res.data;
+                var xData = [],
+                  zxData = [],
+                  rwData = [],
+                  zsData = [];
+                for (var i in data) {
+                  xData.push(data[i].carType);
+                  zxData.push(data[i].zxNum);
+                  rwData.push(data[i].rwNum);
+                  zsData.push(data[i].zsNum);
+                }
+                _this.xData = xData;
+                _this.zxData = zxData;
+                _this.rwData = rwData;
+                _this.zsData = zsData;
+                _this.chart.setOption({
+                  tooltip : {
+                    trigger: 'axis'
+                  },
+                  legend: {
+                    data:['在线数','入网数', '车辆总数']
+                  },
+                  calculable : true,
+                  xAxis : [
+                    {
+                      type : 'category',
+                      axisLabel: { // 旋转横坐标label
+                        show: true,
+                        interval: '0',  // 标签显示挑选间隔，默认为'auto'，可选为：'auto'（自动隐藏显示不下的） | 0（全部显示） |{number}（用户指定选择间隔）
+                        rotate: 45
+                      },
+                      xData : _this.xData
+                    }
+                  ],
+                  yAxis : [
+                    {
+                      type : 'value'
+                    }
+                  ],
+                  series : [
+                    {
+                      name:'在线数',
+                      type:'bar',
+                      data: _this.zxData
+                    },
+                    {
+                      name:'入网数',
+                      type:'bar',
+                      data: _this.rwData
+                    },
+                    {
+                      name:'车辆总数',
+                      type:'bar',
+                      data: _this.zsData
+                    }
+                  ]
+                });
+              } else {
+                console.log('获取数据失败！');
+              }
+            } else {
+              console.log(res.msg);
             }
           }).catch(error => {
 
-          })*/
-          this.chart.setOption({
-            tooltip : {
-              trigger: 'axis'
-            },
-            legend: {
-              data:['在线数','入网数', '车辆总数']
-            },
-            calculable : true,
-            xAxis : [
-              {
-                type : 'category',
-                axisLabel: { // 旋转横坐标label
-                  show: true,
-                  interval: '0',  // 标签显示挑选间隔，默认为'auto'，可选为：'auto'（自动隐藏显示不下的） | 0（全部显示） |{number}（用户指定选择间隔）
-                  rotate: 45
-                },
-                data : ['三类以上班线客车','旅游包车','危险品运输车','重型货运运输车']
-              }
-            ],
-            yAxis : [
-              {
-                type : 'value'
-              }
-            ],
-            series : [
-              {
-                name:'在线数',
-                type:'bar',
-                data: this.zxData
-              },
-              {
-                name:'入网数',
-                type:'bar',
-                data:this.rwData
-              },
-              {
-                name:'车辆总数',
-                type:'bar',
-                data:this.zsData
-              }
-            ]
           });
         }
       },

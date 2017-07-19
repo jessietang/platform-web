@@ -125,70 +125,110 @@
                 endDate: ed,
                 endTime: et
               };
-
-              // 无历史轨迹数据
-              /*_this.tipShow = true;
-              _this.tips = '无历史轨迹数据！';
-              setTimeout(function(){
-                _this.tipShow = false;
-              }, 1000);*/
-
-              // 有历史轨迹数据
-              _this.isShow = false;
-              var trackData = [
-                {
-                  lng: 114.00100,
-                  lat: 22.550000,
-                  location: '成都市双流县航空港',
-                  direction: '正北方向',
-                  SpeedCvt: "60",
-                  LimitSpeed: "40",
-                  GPSDateCvt: "2017-7-13 13:53:12",
-                  receiveDate: "2017-7-13 13:53:30"
-                },
-                {
-                  lng: 114.00130,
-                  lat: 22.550000,
-                  location: '成都市双流县航空港',
-                  direction: '正北方向',
-                  SpeedCvt: "60",
-                  LimitSpeed: "40",
-                  GPSDateCvt: "2017-7-13 14:10:12",
-                  receiveDate: "2017-7-13 14:10:30"
-                },
-                {
-                  lng: 114.00160,
-                  lat: 22.550000,
-                  location: '成都市双流县航空港',
-                  direction: '正北方向',
-                  SpeedCvt: "60",
-                  LimitSpeed: "40",
-                  GPSDateCvt: "2017-7-13 15:20:12",
-                  receiveDate: "2017-7-13 15:20:30"
-                },
-                {
-                  lng: 114.00510,
-                  lat: 22.550000,
-                  location: '成都市双流县航空港',
-                  direction: '正北方向',
-                  SpeedCvt: "60",
-                  LimitSpeed: "40",
-                  GPSDateCvt: "2017-7-13 16:53:12",
-                  receiveDate: "2017-7-13 16:53:30"
-                },
-                {
-                  lng: 114.00537,
-                  lat: 22.549500,
-                  location: '成都市双流县航空港',
-                  direction: '正北方向',
-                  SpeedCvt: "60",
-                  LimitSpeed: "40",
-                  GPSDateCvt: "2017-7-13 17:34:12",
-                  receiveDate: "2017-7-13 13:34:30"
+              axios.get('', postData).then(res => {
+                var res = {
+                  "code": 0,
+                  "data": [
+                    {
+                      lng: 114.00100,
+                      lat: 22.550000,
+                      location: '成都市双流县航空港1',
+                      direction: '正北方向',
+                      speedCvt: "60",
+                      limitSpeed: "40",
+                      gpsDateCvt: "2017-7-13 13:53:12",
+                      receiveDate: "2017-7-13 13:53:30"
+                    },
+                    {
+                      lng: 114.00130,
+                      lat: 22.550000,
+                      location: '成都市双流县航空港2',
+                      direction: '正北方向',
+                      speedCvt: "60",
+                      limitSpeed: "40",
+                      gpsDateCvt: "2017-7-13 14:10:12",
+                      receiveDate: "2017-7-13 14:10:30"
+                    },
+                    {
+                      lng: 114.00160,
+                      lat: 22.550000,
+                      location: '成都市双流县航空港3',
+                      direction: '正北方向',
+                      speedCvt: "60",
+                      limitSpeed: "40",
+                      gpsDateCvt: "2017-7-13 15:20:12",
+                      receiveDate: "2017-7-13 15:20:30"
+                    },
+                    {
+                      lng: 114.00510,
+                      lat: 22.550000,
+                      location: '成都市双流县航空港4',
+                      direction: '正北方向',
+                      speedCvt: "60",
+                      limitSpeed: "40",
+                      gpsDateCvt: "2017-7-13 16:53:12",
+                      receiveDate: "2017-7-13 16:53:30"
+                    },
+                    {
+                      lng: 114.00537,
+                      lat: 22.549500,
+                      location: '成都市双流县航空港5',
+                      direction: '正北方向',
+                      speedCvt: "60",
+                      limitSpeed: "40",
+                      gpsDateCvt: "2017-7-13 17:34:12",
+                      receiveDate: "2017-7-13 13:34:30"
+                    },
+                    {
+                      lng: 114.00507,
+                      lat: 22.548400,
+                      location: '成都市双流县航空港5',
+                      direction: '正北方向',
+                      speedCvt: "60",
+                      limitSpeed: "40",
+                      gpsDateCvt: "2017-7-13 17:34:12",
+                      receiveDate: "2017-7-13 13:34:30"
+                    },
+                    {
+                      lng: 114.00557,
+                      lat: 22.545000,
+                      location: '成都市双流县航空港5',
+                      direction: '正北方向',
+                      speedCvt: "60",
+                      limitSpeed: "40",
+                      gpsDateCvt: "2017-7-13 17:34:12",
+                      receiveDate: "2017-7-13 13:34:30"
+                    },
+                    {
+                      lng: 114.00867,
+                      lat: 22.556000,
+                      location: '成都市双流县航空港5',
+                      direction: '正北方向',
+                      speedCvt: "60",
+                      limitSpeed: "40",
+                      gpsDateCvt: "2017-7-13 17:34:12",
+                      receiveDate: "2017-7-13 13:34:30"
+                    }
+                  ]
+                };
+                if (res.code == 0) {
+                  if (res.data.length > 0) { // 有数据，有历史轨迹
+                    var trackData = res.data;
+                    _this.isShow = false;
+                    _this.$emit('drawTrack', trackData, _this.isShow); // 触发父组件的自定义事件
+                  } else { // 无数据，无历史轨迹
+                    _this.tipShow = true;
+                    _this.tips = '无历史轨迹数据！';
+                    setTimeout(function(){
+                      _this.tipShow = false;
+                    }, 1000);
+                  }
+                } else {
+                  console.log(res.msg);
                 }
-              ];
-              _this.$emit('drawTrack', trackData, _this.isShow); // 触发父组件的自定义事件
-
+              }).catch(error => {
+                console.log(error);
+              });
             }
           } else {
             _this.tipShow = true;

@@ -53,15 +53,33 @@
             userId: _this.userInfo.userId
           };
           axios.get('',postData).then(res => {
-            var zxNum  = 110;
-            var zgNum = 119;
-            var platformAll = 3456;
-            _this.zxNum = zxNum;
-            _this.zgNum = zgNum;
-            _this.platformAll = platformAll;
+            var res = {
+              "code": 0,
+              "data": [
+                {zxNum: 110, zgNum: 119, platformAll: 3456}
+              ]
+            };
+            if (res.code == 0) {
+              if (res.data.length > 0) {
+                var data = res.data[0];
+                var zxNum = data.zxNum,
+                  zgNum = data.zgNum,
+                  platformAll = data.platformAll;
+                _this.zxNum = zxNum;
+                _this.zgNum = zgNum;
+                _this.platformAll = platformAll;
+              } else {
+                alert('获取数据失败！');
+                _this.zxNum = 0;
+                _this.zgNum = 0;
+                _this.platformAll = 0;
+              }
+            } else {
+              console.log(res.msg);
+            }
           }).catch(error => {
             console.log(error);
-          })
+          });
         }
 
       },

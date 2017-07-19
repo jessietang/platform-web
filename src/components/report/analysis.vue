@@ -3,8 +3,8 @@
       <!--图表渲染-->
       <ul id="analysisReport">
         <li class="link-list" v-for="(item, index) in linkData"
-            :class="{'tt-type': (item.zhuType && item.congType), 'tf-type': (item.zhuType && !item.congType), 'ff-type': (!item.zhuType && !item.congType)}"
-          @click="goDetail(index)">
+            :class="{'tt-type': (item.zhuType === 0 && item.congType === 0), 'tf-type': ((item.zhuType === 0 && item.congType === 1) || (item.zhuType === 1 && item.congType === 0)), 'ff-type': (item.zhuType === 1 && item.congType === 1)}"
+          @click="goDetail(item.platFormId)">
           <div class="platform-link-left"></div>
           <div class="platform-link-arrow"></div>
           <label class="platfrom-content-link-name">{{item.platName}}</label>
@@ -30,23 +30,7 @@
     export default {
       data () {
         return {
-          linkData: [
-            {
-              zhuType: true,
-              congType: true,
-              platName: '安达通卫星定位服务平台'
-            },
-            {
-              zhuType: true,
-              congType: false,
-              platName: '神州导航智慧北斗道路运输监控平台'
-            },
-            {
-              zhuType: false,
-              congType: false,
-              platName: '四川安吉北斗卫星定位监控平台'
-            }
-          ]
+          linkData: []
         }
       },
       created () {
@@ -59,7 +43,7 @@
       },
       methods: {
         getZhuType (zhuType) {
-          if (zhuType) {
+          if (zhuType === 0) { // 通
             return './static/img/linkTong.png'
           } else {
             return './static/img/linkDuan.png'
@@ -67,25 +51,89 @@
           return './static/img/linkTong.png'
         },
         getCongType (congType) {
-          if (congType) {
+          if (congType === 0) {
             return './static/img/linkTong.png'
           } else {
             return './static/img/linkDuan.png'
           }
           return './static/img/linkTong.png'
         },
-        goDetail (index) {
-          this.$router.push({
+        goDetail (platFormId) {
+          var _this = this;
+          _this.$router.push({
             path: '/platformDetail',
             query: {
-              test: '111111'
+              platFormId: platFormId,
+              userId: _this.userInfo.userId
             }
           })
         },
         initData () {
+          var _this = this;
           // 参数：userId
-
+          var postData = {
+            userId: _this.userInfo.userId
+          };
+          axios.get('', postData).then(res => {
+            // 返回数据：接入平台id, 接入平台，主链路通断情况、从链路通断情况
+            var res = {
+              "code": 0,
+              "data": [
+                {
+                  platFormId: 0,
+                  zhuType: 0, // 连接
+                  congType: 0, // 连接
+                  platName: '安达通卫星定位服务平台'
+                },
+                {
+                  platFormId: 1,
+                  zhuType: 0, // 连接
+                  congType: 1, // 断开
+                  platName: '神州导航智慧北斗道路运输监控平台'
+                },
+                {
+                  platFormId: 2,
+                  zhuType: 1, // 断开
+                  congType: 1, // 断开
+                  platName: '四川安吉北斗卫星定位监控平台'
+                }
+              ]
+            };
+            if (res.code == 0) {
+              if (res.data.length > 0) { // 有数据
+                var receiveLinkData = res.data;
+                // 按照断开在前连接在后排序后再展示
+                var linkData = [];
+                var dd = [], // 都断
+                  dl = [], // 一个断一个连
+                  ll = []; // 都连
+                for (var i in receiveLinkData) {
+                  if (receiveLinkData[i].zhuType === 1 && receiveLinkData[i].congType === 1) {
+                    dd.push(receiveLinkData[i]);
+                  } else if ((receiveLinkData[i].zhuType === 1 && receiveLinkData[i].congType === 0) || (receiveLinkData[i].zhuType === 0 && receiveLinkData[i].congType === 1)) {
+                    dl.push(receiveLinkData[i]);
+                  } else if (receiveLinkData[i].zhuType === 0 && receiveLinkData[i].congType === 0) {
+                    ll.push(receiveLinkData[i]);
+                  }
+                }
+                linkData = [].concat(dd, dl, ll);
+                _this.linkData = linkData;
+              } else {
+                console.log('暂无数据');
+              }
+            } else {
+              console.log(res.msg);
+            }
+          }).catch(error => {
+            console.log(error);
+          });
         }
+      },
+      mounted () {
+        var _this = this;
+        this.$nextTick(function(){
+          _this.initData();
+        });
       }
     }
 </script>

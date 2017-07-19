@@ -10,6 +10,12 @@ import axios from 'axios' // 引入axios请求
 import {fastclick} from './assets/js/common/index'
 fastclick(document.body) // fastclick用于消除在移动浏览器上触发click事件与一个物理Tap(敲击)之间的300s延迟
 
+import { Picker } from 'mint-ui' //前提是npm install mint-ui --save
+import { Popup } from 'mint-ui'
+import 'mint-ui/lib/style.css'
+Vue.component(Picker.name, Picker)
+Vue.component(Popup.name, Popup)
+
 import './assets/js/common/config'
 import './assets/js/lib/flexible' // 通过js来动态改写meta标签
 

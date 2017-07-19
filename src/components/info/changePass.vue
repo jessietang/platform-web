@@ -89,22 +89,37 @@
                 newPass: _this.newPass,
                 userId: _this.userInfo.userId
               };
-              // 1.旧密码不对
-              /*tips = '您的旧密码不对，请重新填写！';
-              _this.showTips(tips);*/
-
-              // 2.修改失败，未知情况
-              tips = '您的旧密码不对，请重新填写！';
-              _this.showTips(tips);
-
-              // 3.修改成功
-              tips = '密码已修改成功！';
-              _this.showTips(tips);
-              // 输入框置空
-              _this.oldPass = '';
-              _this.newPass = '';
-              _this.surePass = '';
-
+              var res = {
+                "code": 0,
+                "data": [
+                  {"cState": 101, "tips": "密码已修改成功！", newPass: '123abcABC'}
+                ]
+              };
+              /*var res = {
+                "code": 0,
+                "data": [
+                  {"cState": 102, "tips": "您的旧密码不对，请重新填写！", newPass: '123'}
+                ]
+              };*/
+              if (res.code == 0) {
+                if (res.data[0].cState == 101) { // 修改成功
+                  // 修改成功
+                  tips = (res && res.data[0] && res.data[0].tips) || '密码已修改成功！';
+                  _this.showTips(tips);
+                  // 输入框置空
+                  _this.oldPass = '';
+                  _this.newPass = '';
+                  _this.surePass = '';
+                } else if (res.data[0].cState == 102) { // 修改失败，旧密码不对
+                  alert('test');
+                  // 旧密码不对
+                  tips = (res && res.data[0] && res.data[0].tips) || '您的旧密码不对，请重新填写！';
+                   _this.showTips(tips);
+                }
+              } else { // 未知
+                tips = '未知情况，修改失败！';
+                _this.showTips(tips);
+              }
             }
           } else {
             tips = '输入框未全部填完，请填写！';

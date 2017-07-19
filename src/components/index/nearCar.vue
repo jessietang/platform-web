@@ -70,7 +70,7 @@
             width : 600,     // 信息窗口宽度
             //height: 500,     // 信息窗口高度
             title : "信息窗口" , // 信息窗口标题
-            enableMessage:true//设置允许信息窗发送短息
+            enableMessage: true // 设置允许信息窗发送短息
           }
         }
       },
@@ -98,8 +98,7 @@
           geolocation.getCurrentPosition(function(r){
             if(this.getStatus() == BMAP_STATUS_SUCCESS){
               // Icon类表示覆盖物所使用的图标
-              //var myIcon = new BMap.Icon('./static/img/local.png',new BMap.Size(137,62));
-              var myIcon = new BMap.Icon('./static/img/local.png',new BMap.Size(137,62));
+              var myIcon = new BMap.Icon('./static/img/local.png',new BMap.Size(50,52));
               // Marker类表示地图上一个图像标注
               var marker = new BMap.Marker(r.point,{icon:myIcon});
               //添加一个覆盖物
@@ -130,93 +129,76 @@
           };
           console.log(postData);
 
-          /*axios.post('', postData).then(res => {
+          axios.get('', postData).then(res => {
+            var res = {
+              "code": 0,
+              "data": [
+                {
+                  "lng": _this.myPoint.lng + Math.random() / 100, // 纬度
+                  lat: _this.myPoint.lat - Math.random() / 1000, // 经度
+                  carId: 1, // 车辆id
+                  unitName: "网阔信息1111", // 所属企业
+                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
+                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米", // 最新位置
+                  speedCvt: "60", // 速度
+                  limitSpeed: "40", // 限速值
+                  gpsDateCvt: "2017-6-20 11:59", // 定位时间
+                  receiveDate: "2017-6-20 12:00", // 接收时间
+                  carType: '危险品1', // 车辆类型
+                  carColor: '黄', // 车颜色
+                  carPlat: '川A5434', // // 车牌号
+                  corporation: '成都王阔信息技术股份有限公司' // 所属营运商
+                },
+                {
+                  lng: _this.myPoint.lng + Math.random() / 100,
+                  lat: _this.myPoint.lat - Math.random() / 1000,
+                  carId: 2,
+                  unitName: "网阔信息2222", // 所属企业
+                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
+                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米",
+                  speedCvt: "60",
+                  limitSpeed: "40",
+                  gpsDateCvt: "2017-6-20 11:59", // 定位时间
+                  receiveDate: "2017-6-20 12:00", // 接收时间
+                  carType: '危险品2',
+                  carColor: '红',
+                  carPlat: '川A1234',
+                  corporation: '成都王阔信息技术股份有限公司'
+                }
+              ]
+            };
             if (res.code == 0) {
-
+              if (res.data.length > 0) { // 有数据
+                var nearData = res.data;
+                for (let i in nearData) {
+                  var option = nearData[i];
+                  console.log(option);
+                  var myIcon = new BMap.Icon("./static/img/nearCar.png", new BMap.Size(36,36));// 附近的车辆定位图标
+                  let marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
+                  _this.map.addOverlay(marker);
+                  // carDetailObj作为局部变量
+                  var carDetailObj = {
+                    carId: option.carId,
+                    carType: option.carType,
+                    carPlat: option.carPlat,
+                    carColor: option.carColor,
+                    unitName: option.unitName,
+                    platformName: option.platformName,
+                    location: option.location,
+                    corporation: option.corporation
+                  };
+                  console.log(carDetailObj);
+                  _this.addClickHandler(marker, carDetailObj);
+                }
+              } else { // 无数据
+                alert('附近暂无车辆！');
+              }
+            } else {
+              console.log(res.msg);
             }
           }).catch(error => {
             console.log(error);
-          });*/
-          // 收到点的位置信息并标记出来
-          var nearData = [
-            {
-              carNum: "湘AE3333",
-              option: {
-                lng: _this.myPoint.lng + Math.random() / 100,
-                lat: _this.myPoint.lat - Math.random() / 1000,
-                carId: 1,
-                zIndex: 100,
-                UnitName: "网阔信息1111", // 所属企业
-                PlatformName: "成都网阔信息技术股份有限公司", // 接入平台
-                Location: "四川省成都市都江堰市都江堰市徐渡小学西南319米",
-                SpeedCvt: "60",
-                LimitSpeed: "40",
-                alarmType: "超速",
-                GPSDateCvt: "2017-6-20",
-                carType: '危险品1',
-                carColor: '黄',
-                carPlat: '川A5434',
-                corporation: '成都王阔信息技术股份有限公司'
-              }
-            },
-            {
-              carNum: "湘AE3333",
-              option: {
-                lng: _this.myPoint.lng + Math.random() / 100,
-                lat: _this.myPoint.lat - Math.random() / 1000,
-                carId: 2,
-                zIndex: 100,
-                UnitName: "网阔信息2222", // 所属企业
-                PlatformName: "成都网阔信息技术股份有限公司", // 接入平台
-                Location: "四川省成都市都江堰市都江堰市徐渡小学西南319米",
-                SpeedCvt: "60",
-                LimitSpeed: "40",
-                alarmType: "2-5点运行报警",
-                GPSDateCvt: "2017-6-20",
-                carType: '危险品2',
-                carColor: '红',
-                carPlat: '川A1234',
-                corporation: '成都王阔信息技术股份有限公司'
-              }
-            }
-          ];
-
-          for (let i in nearData) {
-            var option = nearData[i].option;
-            console.log(option);
-            var myIcon = new BMap.Icon("./static/img/nearCar.png", new BMap.Size(36,36));// 搜索到的车辆定位图标
-            let marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
-            _this.map.addOverlay(marker);
-
-            // 开始是下面这样写的，然后就一直取到的是循环结束后的最后一个值的信息，找了好久，
-            // 最开始以为是闭包导致的，但是同时也在想，carPosition.vue里面也是类似的写法，那边可以，这里却不行。
-            // 后来想通了，下面这种写法的话，相当于carDetailObj是个全局变量了，页面上会在循环的时候就改变值，以至于循环结束之后，
-            // 拿到的是最后一个值，页面上渲染的也总是最后一个值。
-            /*_this.carDetailObj.carId = option.carId;
-            _this.carDetailObj.carType = option.carType;
-            _this.carDetailObj.carColor = option.carColor;
-            _this.carDetailObj.carPlat = option.carPlat;
-            _this.carDetailObj.unitName = option.UnitName;
-            _this.carDetailObj.platformName = option.PlatformName;
-            _this.carDetailObj.location = option.Location;*/
-            //let carDetailObj = _this.carDetailObj;
-
-            // 正确写法
-            // carDetailObj作为局部变量
-            var carDetailObj = {
-              carId: option.carId,
-              carType: option.carType,
-              carPlat: option.carPlat,
-              carColor: option.carColor,
-              unitName: option.UnitName,
-              platformName: option.PlatformName,
-              location: option.Location,
-              corporation: option.corporation
-            }
-            console.log(carDetailObj);
-            _this.addClickHandler(marker, carDetailObj);
-          }
-
+          });
         },
         addClickHandler (marker, carDetailObj) {
           var _this = this;
@@ -232,7 +214,7 @@
         // 精确搜索（一个值）
         searchPlat () {
           var _this = this;
-          var keyWords = this.platNum;
+          var keyWords = _this.platNum;
           if (keyWords.length < 4) {
             this.tips = '请至少输入四位要查询的车牌号！';
             this.tipShow = true;
@@ -241,115 +223,72 @@
             }, 1000);
           } else {
             // 参数：车牌号 、用户id
-            let postData = {
-              keyWords: keyWords,
+            var postData = {
+              platNum: keyWords,
               userId: _this.userInfo.userId
             };
-            // 1. 有结果
-            // 拿到搜到的点的信息(注意，可能有多个,这里暂时只做一个的),例如
-            var data = {
-              carNum: "湘AE3333",
-              option: {
-                lng: _this.myPoint.lng + Math.random() / 100,
-                lat: _this.myPoint.lat - Math.random() / 1000,
-                carId: 3,
-                zIndex: 100,
-                UnitName: "网阔信息3333", // 所属企业
-                PlatformName: "成都网阔信息技术股份有限公司", // 接入平台
-                Location: "四川省成都市都江堰市都江堰市徐渡小学西南319米",
-                SpeedCvt: "60",
-                LimitSpeed: "40",
-                alarmType: "超速",
-                GPSDateCvt: "2017-6-20",
-                carType: '危险品3',
-                carColor: '绿',
-                carPlat: '川A0000',
-                corporation: '成都王阔信息技术股份有限公司'
+            axios.get('', postData).then(res => {
+              var res = {
+                "code": 0,
+                "data": [
+                  {
+                    lng: _this.myPoint.lng + Math.random() / 100,
+                    lat: _this.myPoint.lat - Math.random() / 1000,
+                    carId: 3,
+                    unitName: "网阔信息3333", // 所属企业
+                    platformName: "成都网阔信息技术股份有限公司", // 接入平台
+                    location: "四川省成都市都江堰市都江堰市徐渡小学西南319米",
+                    speedCvt: "60",
+                    limitSpeed: "40",
+                    gpsDateCvt: "2017-6-20 11:59", // 定位时间
+                    receiveDate: "2017-6-20 12:00", // 接收时间
+                    carType: '危险品3',
+                    carColor: '绿',
+                    carPlat: '川A1234',
+                    corporation: '成都王阔信息技术股份有限公司'
+                  }
+                ]
+              };
+              if (res.code == 0) {
+                if (res.data.length > 0) { // 有结果
+                  var option = res.data[0]; // res.data[0], 不是res.data， 这里注意哦！！！
+                  var myIcon = new BMap.Icon("./static/img/resultCar.png", new BMap.Size(22,33));// 搜索到的车辆定位图标
+                  var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
+                  _this.map.addOverlay(marker);
+                  _this.map.centerAndZoom(new BMap.Point(option.lng,option.lat), 16);
+                  // carDetailObj作为局部变量
+                  var carDetailObj = {
+                    carId: option.carId,
+                    carType: option.carType,
+                    carPlat: option.carPlat,
+                    carColor: option.carColor,
+                    unitName: option.unitName,
+                    platformName: option.platformName,
+                    location: option.location,
+                    corporation: option.corporation // 所属营运商
+                  };
+                  // 搜到结果后就展开车辆的详细信息
+                  _this.isOpenPopUp = true;
+                  // 把车的详细信息保存到store里面,而不是通过query传递，这样防止在切换定位和轨迹的时候丢失数据
+                  _this.$store.dispatch('saveCarInfo', carDetailObj);
+                  _this.$router.push({
+                    path: '/web/index/nearCar/carPosition'
+                  });
+                  _this.addClickHandler(marker, carDetailObj);
+                } else { // 无结果
+                  // 2.无结果
+                  this.tips = '未查询到相关结果！';
+                  this.tipShow = true;
+                  setTimeout(function(){
+                    _this.tipShow = false;
+                  }, 1000);
+                }
+              } else {
+                console.log(res.msg);
               }
-            };
-            var option = data.option;
-            var myIcon = new BMap.Icon("./static/img/resultCar.png", new BMap.Size(22,33));// 搜索到的车辆定位图标
-            var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
-            _this.map.addOverlay(marker);
-            _this.map.centerAndZoom(new BMap.Point(option.lng,option.lat), 16);
-            // carDetailObj作为局部变量
-            var carDetailObj = {
-              carId: option.carId,
-              carType: option.carType,
-              carPlat: option.carPlat,
-              carColor: option.carColor,
-              unitName: option.UnitName,
-              platformName: option.PlatformName,
-              location: option.Location,
-              corporation: option.corporation // 所属营运商
-            };
-            // 搜到结果后就展开车辆的详细信息
-            _this.isOpenPopUp = true;
-            // 把车的详细信息保存到store里面,而不是通过query传递，这样防止在切换定位和轨迹的时候丢失数据
-            _this.$store.dispatch('saveCarInfo', carDetailObj);
-            _this.$router.push({
-              path: '/web/index/nearCar/carPosition'
-            });
-            _this.addClickHandler(marker, carDetailObj);
-
-            // 2.无结果
-            /*this.tips = '未查询到相关结果！';
-            this.tipShow = true;
-            setTimeout(function(){
-              _this.tipShow = false;
-            }, 1000);*/
-
-            /*axios.post('', postData).then(res => {
-               let postData = {
-               keyWords: keyWords
-               };
-               // 1. 有结果
-               // 拿到搜到的点的信息(注意，可能有多个,这里暂时只做一个的),例如
-               var data = {
-                 carNum: "湘AE3333",
-                 option: {
-                   lng: 104.07946,
-                   lat: 30.50325,
-                   zIndex: 100,
-                   UnitName: "网阔信息", // 所属企业
-                   PlatformName: "成都网阔信息技术股份有限公司", // 接入平台
-                   Location: "四川省成都市都江堰市都江堰市徐渡小学西南319米",
-                   SpeedCvt: "60",
-                   LimitSpeed: "40",
-                   GPSDateCvt: "2017-6-20",
-                   carType: '危险品',
-                   carColor: '黄',
-                   carPlat: '川A5434'
-                 }
-               };
-               var option = data.option;
-               var myIcon = new BMap.Icon("./static/img/resultCar.png", new BMap.Size(22,33));// 搜索到的车辆定位图标
-               var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
-               _this.map.addOverlay(marker);
-               _this.map.centerAndZoom(new BMap.Point(option.lng,option.lat), 16);
-               _this.carDetailObj.carType = option.carType;
-               _this.carDetailObj.carColor = option.carColor;
-               _this.carDetailObj.carPlat = option.carPlat;
-               _this.carDetailObj.unitName = option.UnitName;
-               _this.carDetailObj.platformName = option.PlatformName;
-               _this.carDetailObj.location = option.Location;
-               _this.isOpenPopUp = true;
-               // 把车的详细信息保存到store里面,而不是通过query传递，这样防止在切换定位和轨迹的时候丢失数据
-               _this.$store.dispatch('saveCarInfo', _this.carDetailObj);
-               _this.$router.push({
-               path: '/web/index/nearCar/carPosition'
-               })
-               _this.addClickHandler(marker);
-
-               // 2.无结果
-               this.tips = '未查询到相关结果！';
-               this.tipShow = true;
-               setTimeout(function(){
-               _this.tipShow = false;
-               }, 1000);
             }).catch(error => {
               console.log(error);
-            });*/
+            });
           }
         },
         // 画历史轨迹图
@@ -367,43 +306,32 @@
           for(var i in data){
             points.push(new BMap.Point(data[i].lng, data[i].lat))
           }
-
-          /*{
-            lng: 114.00250,
-              lat: 22.550340,
-            location: '成都市双流县航空港',
-            direction: '正北方向',
-            SpeedCvt: "60",
-            LimitSpeed: "40",
-            GPSDateCvt: "2017-7-13 13:53:12",
-            receiveDate: "2017-7-13 13:53:30"
-          }*/
+          // 清除地图上的覆盖物
+          _this.map.clearOverlays();
+    /*{
+      lng: 114.00250,
+        lat: 22.550340,
+      location: '成都市双流县航空港',
+      direction: '正北方向',
+      SpeedCvt: "60",
+      LimitSpeed: "40",
+      GPSDateCvt: "2017-7-13 13:53:12",
+      receiveDate: "2017-7-13 13:53:30"
+    }*/
           //通过DrivingRoute获取一条路线的point
           // DrivingRoute获取驾车路线规划方案
           var driving = new BMap.DrivingRoute(_this.map); // 当参数为地图实例时，检索位置由地图当前的中心点确定
-          // driving.search(points[0], points[len-1]); //发起检索（起点，终点）
           driving.search(points[0], points[points.length-1]); //发起检索（起点，终点）
           // 设置检索结束后的回调函数
           driving.setSearchCompleteCallback(function() {
-            //得到路线上的所有point
-            //driving.getResults() 返回最近一次检索的结果，返回值DrivingRouteResult
-            //DrivingRouteResult方法： getPlan(i:Number)返回索引指定的方案，索引0表示第一条方案 返回值RoutePlan
-            //RoutePlanl类(表示一条驾车或步行出行方案)
-            // RoutePlanl类 方法：getRoute(i: Number)返回值Route类型 返回方案中索引指定的线路
-            // Route类的getPath()方法，返回路线的地理坐标点数组 返回值类型Array<Point>
-            //points = driving.getResults().getPlan(0).getRoute(0).getPath();
-            console.log(points);
             //画面移动到起点和终点的中间
             centerPoint = new BMap.Point((points[0].lng + points[points.length - 1].lng) / 2, (points[0].lat + points[points.length - 1].lat) / 2);
             _this.map.panTo(centerPoint);
-            //连接所有点
-            // Polyline使用浏览器的矢量制图工具（如果可用）在地图上绘制折线的地图叠加层
-            _this.map.addOverlay(new BMap.Polyline(points, {strokeColor: "black", strokeWeight: 5, strokeOpacity: 1}));
 
-            //显示小车子
+            //显示跟踪的图片
             // Label此类表示地图上的文本标注
             label = new BMap.Label("", {offset: new BMap.Size(10, -30)});
-            var myIcon = new BMap.Icon("./static/img/nearCar.png", new BMap.Size(36,36));// 搜索到的车辆定位图标
+            var myIcon = new BMap.Icon("./static/img/directive.png", new BMap.Size(27,27));// 跟踪图标
             car = new BMap.Marker(points[0], {icon: myIcon}); // 创建Marker实例
             car.setLabel(label); // 为标注添加文本标注
             _this.map.addOverlay(car);
@@ -414,21 +342,23 @@
               var point = points[index];
               console.log(index);
               if(index > 0) {
-                _this.map.addOverlay(new BMap.Polyline([points[index - 1], point], {strokeColor: "#83c2ec", strokeWeight: 1, strokeOpacity: 1}));
+                _this.map.addOverlay(new BMap.Polyline([points[index - 1], point], {strokeColor: "#83c2ec", strokeWeight: 6, strokeOpacity: 1}));
               }
               // 点标记跟踪
               if (index > -1 && index < points.length){
                 var html = '<div class="map-info-win"><table>' +
                   "<tr><td>所属企业：</td><td>" + _this.carDetail.unitName + '</td></tr>' +
                   "<tr><td>所属营运商：</td><td>" + _this.carDetail.corporation + '</td></tr>' +
-                  "<tr><td>速度/限速值：</td><td>" + data[index].SpeedCvt + "/" + data[index].LimitSpeed + ' km/h</td></tr>' +
+                  "<tr><td>速度/限速值：</td><td>" + data[index].speedCvt + "/" + data[index].limitSpeed + ' km/h</td></tr>' +
                   "<tr><td>车辆类型：</td><td>" + _this.carDetail.carType + '</td></tr>' +
                   "<tr><td>接入平台：</td><td>" + _this.carDetail.platformName + '</td></tr>' +
                   '<tr><td>地址：</td><td>' + data[index].location + '</td></tr>' +
-                  '<tr><td>定位时间：</td><td>' + data[index].GPSDateCvt + '</td></tr>' +
+                  '<tr><td>定位时间：</td><td>' + data[index].gpsDateCvt + '</td></tr>' +
                   '<tr><td>接收时间：</td><td>' + data[index].receiveDate + '</td></tr>' +
                   "</table></div>";
-                var myIcon2 = new BMap.Icon("./static/img/bullet.png", new BMap.Size(12,12));// 搜索到的车辆定位图标
+                // 这里的所有点的title都是同一辆车的，所以这里可以这样用
+                _this.opts.title = `<h2 style="font-size:14px;border-bottom: 1px solid #eee;margin-bottom: 10px;">${_this.carDetail.carPlat}${_this.carDetail.carColor}</h2>`;
+                var myIcon2 = new BMap.Icon("./static/img/bullet.png", new BMap.Size(12,12));// 轨迹点标记图标
                 var marker = new BMap.Marker(points[index], {icon: myIcon2}); // 创建Marker实例
                 _this.map.addOverlay(marker);
                 // 给轨迹上的每一个点绑定点击开启信息窗口的事件
@@ -438,15 +368,12 @@
                   _this.map.openInfoWindow(infoWindow, point); //开启信息窗口
                 });
               }
-              //label.setContent("经度: " + point.lng + "<br>纬度: " + point.lat);
               car.setPosition(point); // 设置标注的地理坐标
               index++;
               // 画面跟随
-              // _this.map.panTo(point);
-              // alert(points.length);
+              //_this.map.panTo(point);
               if(index < points.length) {
-                console.log('index:'+index);
-                timer = window.setTimeout(play, 100); // 在函数内部通过setTimeout再次调用函数本身，达到setInterval类似的的效果
+                timer = window.setTimeout(play, 300); // 在函数内部通过setTimeout再次调用函数本身，达到setInterval类似的的效果
               } else {
                 _this.map.panTo(point);
               }

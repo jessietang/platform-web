@@ -1,52 +1,28 @@
 <template lang="html">
   <div id="sixStrictBan">
     <!--查询条件-->
-    <el-form ref="form" :model="form" label-width="60px" class="form">
-      <el-form-item label="地区" style="margin-bottom: 12px;">
-        <el-form class="demo-ruleForm"  label-position="top" style="margin-bottom: 0;">
-          <el-row :gutter="20" class="address">
-            <el-col :span="12" style="padding-left:0;padding-right:10px;">
-              <el-form-item prop="province">
-                <el-select v-model="form.place.province" placeholder="请输入省" >
-                  <el-option
-                    v-for="item in provinces"
-                    :key="item.value"
-                    :value="item.value"
-                    ></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
+    <mt-popup
+      v-model="popupVisible"
+      position="top" style="width:100%;z-index:2003;">
+      <mt-picker :slots="addressSlots" class="picker" @change="onAddressChange" :visible-item-count="5" ></mt-picker >
+    </mt-popup>
 
-            <el-col :span="12" style="padding-left:10px;padding-right:0;">
-              <el-form-item  prop="city">
-                <el-select v-model="form.place.city" placeholder="请选择市" >
-                  <el-option
-                    v-for="item in cities"
-                    :key="item.value"
-                    :value="item.value">
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
+    <ul class="search-form">
+      <li class="list">
+        <label for="">地区</label>
+        <input type="text" @click="showPopUp()" v-model="searchPlace" placeholder="点击选择地区"/>
+      </li>
+      <li class="list">
+        <label for="">服务商</label>
+        <input type="text" placeholder="请输入服务商" v-model="serviceProvider"/>
+      </li>
+      <li class="list">
+        <label for="">企业</label>
+        <input type="text" placeholder="请输入企业" v-model="companyName"/>
+      </li>
+    </ul>
+    <div class="search-btn" @click="searchByFilter()">查询</div>
 
-            <el-col :span="24" style="margin-top: 10px;padding-left:0;padding-right:0;">
-              <el-form-item prop="detail">
-                <el-input placeholder="请填写详细地址" :number="true" v-model="form.place.detail"></el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </el-form>
-      </el-form-item>
-      <el-form-item label="服务商" style="margin-bottom: 12px;">
-        <el-input v-model="form.serviceProvider" placeholder="请填写服务商"></el-input>
-      </el-form-item>
-      <el-form-item label="企业" style="margin-bottom: 12px;">
-        <el-input v-model="form.company" placeholder="请填写企业"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="searchByFilter()" style="width: 100%;">查&nbsp;&nbsp;询</el-button>
-      </el-form-item>
-    </el-form>
 
     <!--切换按钮 企业、地区、服务商-->
     <div class="switch-line clearfix">
@@ -68,90 +44,194 @@
 <script lang="babel">
   import echarts from 'echarts'
   import axios from 'axios'
-  import $ from 'n-zepto'
-  import addressData from '../../assets/js/lib/addressData.js'
-  function formatData (data) {
-    var result = []
-    for (var key in data) {
-      result.push({
-        value: key
-      })
-    }
-    return result
-  }
-
+  import s from '../../assets/js/lib/address3.json'
+  import {mapState} from 'vuex'
   export default {
     data () {
       return {
+        popupVisible: false,
         // 查询条件数据
-        form: {
-          serviceProvider: '',
-          company: '',
-          place: {
-            province: '四川省',
-            city: '',
-            district: '',
-            detail: ''
+        addressSlots: [
+          {
+            flex: 1,
+            defaultIndex: 1,
+            values: Object.keys(s), // 把省的集合赋给第一个
+            className: 'slot1',
+            textAlign: 'center'
+          }, {
+            divider: true,
+            content: '-',
+            className: 'slot2'
+          }, {
+            flex: 1,
+            values: [],
+            className: 'slot3',
+            textAlign: 'center'
+          }, {
+            divider: true,
+            content: '-',
+            className: 'slot4'
+          }, {
+            flex: 1,
+            values: [],
+            className: 'slot5',
+            textAlign: 'center'
           }
-        },
+        ],
+        addressProvince: '省',
+        addressCity: '市',
+        addressXian: '区',
+        // 本来想的是给地区一个初始值，但是发现没用，因为刚一进去就出发了change事件，后来想了想，也不用，
+        // 当地区为空的时候，下面就按地区id展示所有的，就跟我不输入服务商而下面选择按照服务商展示一样
+        searchPlace: '四川', // 地区
+        serviceProvider: '', // 服务商
+        companyName:'', // 企业
         // 下拉切换选择数据
         showOptions: [{
-          value: '地区',
+          value: '1',
           label: '地区'
         }, {
-          value: '服务商',
+          value: '2',
           label: '服务商'
         }, {
-          value: '企业',
+          value: '3',
           label: '企业'
         }],
-        showValue: '地区',
-        provinces: formatData(addressData),
+        showValue: '1',
         // 图表数据
-        yData: ['成都市','自贡市','攀枝花市','泸州市','德阳市','绵阳市','广元市'],
+        yData: [], // 纵坐标，数据项名称
         chart: null,
-        zxData: [320, 302, 301, 334, 390, 330, 320],
-        rwData: [120, 132, 101, 134, 90, 230, 210],
-        zsData: [220, 182, 191, 234, 290, 330, 310],
+        zxData: [], // 在线数
+        rwData: [], // 入网数
+        zsData: [], // 车辆总数
+        dataSelectId: [] // 地区ID、服务商ID、企业ID
       }
     },
     computed: {
-      cities () {
-        return formatData(addressData[this.form.place.province])
-      }
+      ...mapState([
+        'userInfo'
+      ])
     },
     methods: {
+      // 控制popup的显示隐藏
+      showPopUp () {
+        this.popupVisible = true;
+      },
+      // 地区选择改变时触发
+      onAddressChange(picker, values) {
+        let sheng = Object.keys(s);
+        //console.log(sheng) // ['四川','湖南'，]
+        // values[0] 四川  s[values[0]] 成都市、广安市。。
+        let shi = Object.keys(s[values[0]]);
+        //console.log(shi); // ["太原市", "大同市", "阳泉市", "长治市", "晋城市", "朔州市", "晋中市", "运城市", "忻州市", "临汾市", "吕梁市"]
+        picker.setSlotValues(1, shi); // 把市的集合赋给第二个
+        //console.log(values[0]); // 山西省
+        //console.log(values[1]); // 太原市
+        let xian = s[values[0]][values[1]];
+        //console.log(s[values[0]][values[1]]); // 某个市下面的所有县的集合
+        if (values[0] === '省') {
+          this.addressProvince = '';
+        } else {
+          this.addressProvince = values[0];
+        }
+
+        if (values[1] === '市') {
+          this.addressCity = '';
+        } else {
+          this.addressCity = values[1];
+        }
+
+        if (values[2] === '县' || values[2] === '区') {
+          this.addressXian = '';
+        } else {
+          this.addressXian = values[2];
+        }
+        // input框最终选择的地址
+        this.searchPlace = this.addressProvince + this.addressCity + this.addressXian;
+        picker.setSlotValues(2, xian); // 把县的集合赋给第三个value
+      },
       // 条件搜索
       searchByFilter () {
-        var province = this.form.place.province;
-        var city = this.form.place.city;
-        var district = this.form.place.detail;
-        var detail = this.form.place.detail;
-        var serviceProvider = this.form.serviceProvider;
-        var company = this.form.company;
-        var nowSelect = this.showValue; // 默认展示方式
+        var _this = this;
+        var zoneId = _this.userInfo.zoneId; // 区域id
+        var searchPlace = _this.searchPlace;
+        var serviceProvider = _this.serviceProvider;
+        var companyName = _this.companyName;
+        var nowSelect = _this.showValue; // 默认展示方式  1：地区。2：服务商。3：企业
+        var userId = _this.userInfo.userId;
 
-        var postData = {};
-        // 模拟的
-        this.zxData = [20, 2, 1, 4, 39, 30, 20];
-        this.chart.clear(); //清空图表
-        this.drawPie('banReport');
-
-        /*axios.post('',postData).then(res => {
+        // 参数 : 地区id、详细地址、服务商、企业、展示方式、用户id
+        var postData = {
+          zoneId: zoneId,
+          searchPlace: searchPlace,
+          serviceProvider: serviceProvider,
+          companyName: companyName,
+          nowSelect: nowSelect,
+          userId: userId
+        };
+        axios.get('', postData).then(res => {
+          // 返回数据：
+          // 1根据展示方式，返回地区ID、服务商ID、企业ID
+          // 2根据展示方式，返回地区名称、服务商名称、企业名称
+          // 3在线数、入网数、车辆总数
+          var res = {
+            "code": 0,
+            "data": [
+              {zId: 100, yName: '成都市', zxNum: 220, rwNum: 1200, zsNum: 2220},
+              {zId: 101, yName: '自贡市', zxNum: 232, rwNum: 1302, zsNum: 1282},
+              {zId: 102, yName: '成都市', zxNum: 220, rwNum: 1200, zsNum: 2220},
+              {zId: 103, yName: '自贡市', zxNum: 232, rwNum: 1302, zsNum: 1282},
+              {zId: 104, yName: '成都市', zxNum: 220, rwNum: 1200, zsNum: 2220},
+              {zId: 105, yName: '自贡市', zxNum: 232, rwNum: 1302, zsNum: 1282},
+              {zId: 106, yName: '成都市', zxNum: 220, rwNum: 1200, zsNum: 2220}
+            ]
+          };
           if (res.code == 0) {
-            // do sth
-            // 拿到各种需要的data后，把data值重新赋值，然后清空之前的，再重新绘制一次图表
-             this.zxData = [20, 2, 1, 4, 39, 30, 20];
-             this.chart.clear(); //清空图表
-             this.drawPie('banReport');
+            if (res.data.length > 0) { // 有数据
+              var data = res.data;
+              var yData = [], // 纵坐标，数据项名称
+                zxData = [], // 在线数
+                rwData = [], // 入网数
+                zsData = [], // 车辆总数
+                dataSelectId = []; // 地区ID、服务商ID、企业ID
+              for (var i in data) {
+                yData.push(data[i].yName);
+                zxData.push(data[i].zxNum);
+                rwData.push(data[i].rwNum);
+                zsData.push(data[i].zsNum);
+                dataSelectId.push(data[i].zId);
+              }
+              _this.yData = yData; // 纵坐标，数据项名称
+              _this.zxData = zxData; // 在线数
+              _this.rwData = rwData; // 入网数
+              _this.zsData = zsData; // 车辆总数
+              _this.dataSelectId = dataSelectId; // 地区ID、服务商ID、企业ID
+              _this.chart.clear(); //每次画图之前都先清除掉之前的 清空图表
+              _this.drawPie('banReport'); // 清除完再画
+              // 绑定点击事件
+              _this.chart.on('click', function(param){
+                var index = param.dataIndex;
+                var dataId = _this.dataSelectId[index]; // 选择项id
+                _this.$router.push({
+                  path: '/zxDetail',
+                  query: {
+                    dataId: dataId,
+                    nowSelect: nowSelect,
+                    userId: userId
+                  }
+                });
+              });
+            }
+          } else {
+            console.log(res.msg);
           }
         }).catch(error => {
           console.log(error);
-        });*/
+        });
       },
       // 图表绘制
       drawPie (id) {
-        this.chart = echarts.init(document.getElementById(id))
+        this.chart = echarts.init(document.getElementById(id));
         this.chart.setOption({
           tooltip : {
             trigger: 'axis',
@@ -205,56 +285,25 @@
         })
       }
     },
+
     mounted () {
       var _this = this;
       this.$nextTick(function(){
-        // 初始化的时候，先去请求接口，然后在画图
-        /*let data = {
-         userId: 192,
-         dataType: 'json'
-         }
-         axios.get('/activity/findTop100UserPrizes', data).then(res => {
-         if (res.data.code === 0) {
-         let opinionData = res.data.data
-         this.opinionData = opinionData
-         }
-         }).catch(error => {
-         console.log(error)
-         })*/
-        this.rwData = [1200, 1302, 1010, 1304, 900, 2030, 2100];
-        this.drawPie('banReport');
-        // 绑定点击事件
-        this.chart.on('click', function(param){
-          var index = param.dataIndex;
-          _this.$router.push({
-            path: '/zxDetail',
-            query: {
-              dataId: index
-            }
-          });
-        })
+        setTimeout(() => { // 这个是一个初始化默认值的一个技巧
+          _this.addressSlots[0].defaultIndex = 0;
+        }, 100);
+        // 初始化图表
+        // 这里先init一个echarts对象，防止searchByFilter里面调用clear()方法时报错
+        _this.chart = echarts.init(document.getElementById('banReport'));
+        _this.searchByFilter();
+
       });
     },
     watch: {
       // 监听下拉列表值的变化
       showValue(newVal, oldVal) {
-        // 注意这里不需要清除以前的数据this.chart.clear()，因为可能点这里的时候，上面选择的条件早就已经选择了，这里只是切换展示方式
         alert('now: '+ newVal);
-        // 模拟的
-        this.yData = ['111','222','333','444','555','666','777'];
-        this.drawPie('banReport');
-
-        var nowSelect = newVal;
-        var postData = {};
-        /*axios.post('', postData).then(res => {
-          if (res.code == 0) {
-            this.yData = ['111','222','333','444','555','666','777'];
-            this.drawPie('banReport');
-          }
-        }).catch(error => {
-          console.log(error);
-        })*/
-
+        this.searchByFilter();
       }
     }
   }
@@ -277,6 +326,59 @@
     width: 100%;
     height: auto;
 
+    .address {
+      select {
+        width: 30%;
+        display: inline-block;
+
+        option {
+          width: 100%;
+        }
+      }
+    }
+
+    .search-form {
+      @include pxrem(width, 700);
+      margin: auto;
+
+      .list {
+        width: 100%;
+        @include pxrem(height, 110);
+        @include pxrem(padding, 20 0);
+
+        label {
+          display: inline-block;
+          @include pxrem(width, 100);
+          @include pxrem(height, 70);
+          @include pxrem(line-height, 70);
+          text-align: right;
+          color: #48576a;
+          @include pxrem(font-size, 24);
+        }
+
+        input {
+          @include pxrem(width, 480);
+          @include pxrem(height, 70);
+          border: 1px solid #bfcbd9;
+          @include pxrem(border-radius, 5);
+          @include pxrem(margin-left, 10);
+          @include pxrem(padding,3 10);
+        }
+      }
+    }
+
+    .search-btn {
+      @include pxrem(width, 480);
+      @include pxrem(height, 70);
+      @include pxrem(line-height, 70);
+      color: #fff;
+      background-color: #20a0ff;
+      text-align: center;
+      @include pxrem(margin-left,140);
+      @include pxrem(border-radius, 5);
+      @include pxrem(margin-top, 20);
+    }
+
     form {
       width: 90%;
       height: auto;
@@ -286,8 +388,17 @@
     .switch-line {
       width: 100%;
       @include pxrem(height, 84);
-      @extend %flex-center;
+
       @include pxrem(margin-bottom, 30);
+      @include pxrem(margin-top, 40);
+
+      label {
+        @include pxrem(margin-left, 20);
+      }
+
+      input {
+        @include pxrem(width, 480);
+      }
     }
 
     .demo-ruleForm .address.el-row {

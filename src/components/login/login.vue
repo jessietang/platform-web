@@ -49,72 +49,61 @@
           var username = this.username;
           var password = this.password;
           var _this = this;
-          if (!username || !password){
+          if (username !== '' && password !== '') {
+            // 参数： 用户名、密码
+            let postData = {
+              username: username,
+              password: password
+            };
+            axios.get('',postData).then(res => {
+              var res = {
+                "code": 0,
+                "data": [{"userId": "123", "zoneId": "1111"}]
+              };
+              if (res.code == 0) {
+                if (res.data.length > 0) { // 验证通过
+                  var data = res.data;
+                  localStorage.setItem('platformUserName', username);
+                  console.log(localStorage.getItem('platformUserName'));
+                  // 拿到userId,zoneId 保存在store里面
+                  var userId = data[0].userId;
+                  var zoneId = data[0].zoneId;
+                  _this.userInfo.userId = userId;
+                  _this.userInfo.zoneId = zoneId;
+                  var userInfo = _this.userInfo;
+                  // localStorage.setItem() 不会自动将Json对象转成字符串形式
+                  // 如果：localStorage.setItem('platformUserInfo', userInfo);
+                  // 就有：localStorage.getItem('platformUserInfo'); // [object Object]
+                  // 注意这里localStorage保存json对象的方式
+                  localStorage.setItem('platformUserInfo', JSON.stringify(userInfo));
+                  console.log(JSON.parse(localStorage.getItem('platformUserInfo')));
+
+                  // 保存登录状态
+                  localStorage.setItem('platformLoginState', true);
+
+                  //重定向到首页
+                  _this.$router.push({
+                    path: '/web/index/nearCar'
+                  });
+                } else { // 验证不通过
+                  this.errorTip = '用户名或密码错误！';
+                  this.isError = true;
+                  setTimeout(function(){
+                    _this.isError = false;
+                  },1000);
+                }
+              } else {
+                console.log(res.msg);
+              }
+            }).catch(error => {
+                console.log(error);
+            });
+          } else {
             this.errorTip = '用户名或密码不能为空！';
             this.isError = true;
             setTimeout(function(){
               _this.isError = false;
             },1000);
-          } else {
-            // 发请求去后台验证
-            let postData = {};
-            /*axios.post('',postData).then(res => {
-              if (res.code == 0) { // 验证通过
-                // 1.验证通过
-                localStorage.setItem('platformUserName', username);
-                console.log(localStorage.getItem('platformUserName'));
-                // 拿到userId,zoneId 保存在store里面
-                var userId = '0925';
-                var zoneId = '1221';
-                _this.userInfo.userId = userId;
-                _this.userInfo.zoneId = zoneId;
-                _this.$store.dispatch('saveUserId', _this.userInfo);
-                //重定向到首页
-                _this.$router.push({
-                  path: '/web/index/nearCar'
-                })
-              } else { // 验证不通过
-                // 2.验证不通过
-                this.errorTip = '用户名或密码错误！';
-                this.isError = true;
-                setTimeout(function(){
-                  _this.isError = false;
-                },1000);
-              }
-            }).catch(error => {
-              console.log(error);
-            });*/
-
-            // 1.验证通过
-            localStorage.setItem('platformUserName', username);
-            console.log(localStorage.getItem('platformUserName'));
-            // 拿到userId,zoneId 保存在localStorage里面
-            var userId = '0925';
-            var zoneId = '1221';
-            _this.userInfo.userId = userId;
-            _this.userInfo.zoneId = zoneId;
-            var userInfo = _this.userInfo;
-            // localStorage.setItem() 不会自动将Json对象转成字符串形式
-            // 如果：localStorage.setItem('platformUserInfo', userInfo);
-            // 就有：localStorage.getItem('platformUserInfo'); // [object Object]
-            // 注意这里localStorage保存json对象的方式
-            localStorage.setItem('platformUserInfo', JSON.stringify(userInfo));
-            console.log(JSON.parse(localStorage.getItem('platformUserInfo')));
-
-            // 保存登录状态
-            localStorage.setItem('platformLoginState', true);
-
-            //重定向到首页
-            _this.$router.push({
-              path: '/web/index/nearCar'
-            })
-
-            // 2.验证不通过
-            /*this.errorTip = '用户名或密码错误！';
-            this.isError = true;
-            setTimeout(function(){
-              _this.isError = false;
-            },1000);*/
           }
         }
       }

@@ -4,7 +4,7 @@
         <div class="defaultPhoto">
           <img src="./img/defaultPhoto.png" alt=""/>
         </div>
-        <p class="nameText">18380448313</p>
+        <p class="nameText">{{username}}</p>
       </div>
 
       <div class="centerFun">
@@ -35,7 +35,8 @@
     export default {
       data () {
         return {
-          isExitShow: false
+          isExitShow: false,
+          username: localStorage.getItem('platformUserName')
         }
       },
       methods: {
@@ -53,6 +54,7 @@
           var _this = this;
           // 清除登录状态
           localStorage.setItem('platformLoginState', false);
+          _this.isExitShow = false;
           // 跳转到首页
           _this.$router.push({
             path: '/login'

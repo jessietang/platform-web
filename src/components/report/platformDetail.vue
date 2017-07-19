@@ -21,8 +21,10 @@
       data () {
         return {
           chart: null,
-
-          query: {}
+          query: {},
+          xData: [],
+          bjData: [],
+          dwData: []
         }
       },
       created () {
@@ -37,99 +39,131 @@
           this.$router.go(-1);
         },
         drawLine (id) {
-          this.chart = echarts.init(document.getElementById(id));
-          /*let data = {
-           userId: 192,
-           dataType: 'json'
-           }
-           axios.get('/activity/findTop100UserPrizes', data).then(res => {
-           if (res.data.code === 0) {
-           let opinionData = res.data.data
-           this.opinionData = opinionData
-           }
-           }).catch(error => {
-           console.log(error)
-           })*/
-          alert(this.query.test); // 上个页面传过来的值
-          this.chart.setOption({
-            tooltip: {
-              trigger: 'axis',
-
-            },
-            legend: {
-              data: [{ name: '定位', icon: 'rectangle',textStyle:{color:'#1296db'}  },
-                { name: '报警', icon: 'rectangle', textStyle: { color: '#1296db' } }],
-              show:true
-            },
-            calculable: true,
-            color: ['#c2304e', '#8EFEFF'],
-            grid: {
-              x: '10%',
-              x2: '5%',
-              y:'10%'
-            },
-            xAxis: [{
-              name: '时间',
-              type: 'category',
-              boundaryGap: false,
-              data: [0,1,2,3,4,5,6,7,8,9,10],
-              nameTextStyle: {
-                color: '#000'
-              },
-              nameLocation:'start',
-              splitLine: {
-                lineStyle: {
-                  color: '#6F7983'
+          var _this = this;
+          // 参数：接入平台id、用户id
+          var postData = {
+            platFormId: _this.query.platFormId,
+            userId: _this.query.userId
+          };
+          console.log(postData);
+          axios.get('', postData).then(res => {
+            // 返回数据：接入平台id, 小时， 定位数， 报警数
+            var res = {
+              "code": 0,
+              "data": [
+                {platFormId: 0, platHour: 0, posNum:11118, alarmNum: 1118},
+                {platFormId: 1, platHour: 1, posNum:1421, alarmNum: 1231},
+                {platFormId: 2, platHour: 2, posNum:1234, alarmNum: 1118},
+                {platFormId: 3, platHour: 3, posNum:1532, alarmNum: 1231},
+                {platFormId: 4, platHour: 4, posNum:1144, alarmNum: 1118},
+                {platFormId: 5, platHour: 5, posNum:1268, alarmNum: 1231},
+                {platFormId: 6, platHour: 6, posNum:1190, alarmNum: 1118},
+                {platFormId: 7, platHour: 7, posNum:1288, alarmNum: 1231},
+                {platFormId: 8, platHour: 8, posNum:2111, alarmNum: 1118},
+                {platFormId: 9, platHour: 9, posNum:1632, alarmNum: 1231},
+                {platFormId: 10, platHour: 10, posNum:1118, alarmNum: 1118}
+              ]
+            };
+            if (res.code == 0) {
+              if (res.data.length > 0) {
+                var data = res.data;
+                var xData = [], // 小时
+                  dwData = [], // 报警
+                  bjData = []; // 定位
+                for (var i in data) {
+                  xData.push(data[i].platHour);
+                  dwData.push(data[i].posNum);
+                  bjData.push(data[i].alarmNum);
                 }
-              },
-              axisLine: {
-                lineStyle: {
-                  color: '#6F7983'
-                }
-              },
-              axisLabel: {
-                textStyle: {
-                  color: '#000'
-                }
+                _this.xData = xData; // 小时
+                _this.dwData = dwData; // 定位
+                _this.bjData = bjData; // 报警
+                _this.chart = echarts.init(document.getElementById(id));
+                _this.chart.setOption({
+                  tooltip: {
+                    trigger: 'axis',
+                  },
+                  legend: {
+                    data: [{ name: '定位', icon: 'rectangle',textStyle:{color:'#1296db'}  },
+                      { name: '报警', icon: 'rectangle', textStyle: { color: '#1296db' } }],
+                    show:true
+                  },
+                  calculable: true,
+                  color: ['#c2304e', '#8EFEFF'],
+                  grid: {
+                    x: '10%',
+                    x2: '5%',
+                    y:'10%'
+                  },
+                  xAxis: [{
+                    name: '时间',
+                    type: 'category',
+                    boundaryGap: false,
+                    data: _this.xData,
+                    nameTextStyle: {
+                      color: '#000'
+                    },
+                    nameLocation:'start',
+                    splitLine: {
+                      lineStyle: {
+                        color: '#6F7983'
+                      }
+                    },
+                    axisLine: {
+                      lineStyle: {
+                        color: '#6F7983'
+                      }
+                    },
+                    axisLabel: {
+                      textStyle: {
+                        color: '#000'
+                      }
+                    }
+                  }],
+                  yAxis: [{
+                    name:'数据量',
+                    type: 'value',
+                    nameTextStyle: {
+                      color:'#000'
+                    },
+                    axisLabel: {
+                      show:false
+                    },
+                    splitLine: {
+                      lineStyle: {
+                        color: '#6F7983'
+                      }
+                    },
+                    axisLine: {
+                      lineStyle: {
+                        color: '#6F7983'
+                      }
+                    }
+                  }],
+                  series: [
+                    {
+                      name: '报警',
+                      type: 'line',
+                      smooth: true,
+                      data: _this.bjData,
+                      symbol:'none'
+                    },
+                    {
+                      name: '定位',
+                      type: 'line',
+                      smooth: true,
+                      data: _this.dwData,
+                      symbol: 'none'
+                    }
+                  ]
+                });
               }
-            }],
-            yAxis: [{
-              name:'数据量',
-              type: 'value',
-              nameTextStyle: {
-                color:'#000'
-              },
-              axisLabel: {
-                show:false
-              },
-              splitLine: {
-                lineStyle: {
-                  color: '#6F7983'
-                }
-              },
-              axisLine: {
-                lineStyle: {
-                  color: '#6F7983'
-                }
-              }
-            }],
-            series: [
-              {
-                name: '报警',
-                type: 'line',
-                smooth: true,
-                data: [1118, 1231, 215, 4143, 9442, 15303, 1903, 9289, 9995,145022,1111,11102],
-                symbol:'none'
-              },
-              {
-                name: '定位',
-                type: 'line',
-                smooth: true,
-                data: [111118, 12321, 24315, 41344, 9255, 16603, 19340, 93289, 9949,1022,21221],
-                symbol: 'none'
-              }
-            ]
-          })
+            } else {
+              console.log(res.msg);
+            }
+          }).catch(error => {
+            console.log(error);
+          });
         }
       },
       mounted () {
