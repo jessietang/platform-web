@@ -86,7 +86,7 @@
                     trigger: 'axis'
                   },
                   legend: {
-                    data:['在线数','入网数', '车辆总数']
+                    data: ['在线数','入网数', '车辆总数']
                   },
                   calculable : true,
                   xAxis : [
@@ -97,7 +97,7 @@
                         interval: '0',  // 标签显示挑选间隔，默认为'auto'，可选为：'auto'（自动隐藏显示不下的） | 0（全部显示） |{number}（用户指定选择间隔）
                         rotate: 45
                       },
-                      xData : _this.xData
+                      data: _this.xData
                     }
                   ],
                   yAxis : [
