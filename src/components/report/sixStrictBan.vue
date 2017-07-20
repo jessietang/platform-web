@@ -7,7 +7,7 @@
       <mt-picker :slots="addressSlots" class="picker" @change="onAddressChange" :visible-item-count="5" ></mt-picker >
     </mt-popup>
 
-    <ul class="search-form">
+    <ul class="search-form clearfix">
       <li class="list">
         <label for="">地区</label>
         <input type="text" @click="showPopUp()" v-model="searchPlace" placeholder="点击选择地区"/>
@@ -20,22 +20,23 @@
         <label for="">企业</label>
         <input type="text" placeholder="请输入企业" v-model="companyName"/>
       </li>
+      <!--切换按钮 企业、地区、服务商-->
+      <li class="list switch-line clearfix">
+        <label for="">展示方式</label>
+        <el-select v-model="showValue" placeholder="请选择">
+          <el-option
+            v-for="item in showOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </li>
     </ul>
     <div class="search-btn" @click="searchByFilter()">查询</div>
 
 
-    <!--切换按钮 企业、地区、服务商-->
-    <div class="switch-line clearfix">
-      <label for="">展示方式：</label>
-      <el-select v-model="showValue" placeholder="请选择">
-        <el-option
-          v-for="item in showOptions"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
-        </el-option>
-      </el-select>
-    </div>
+
 
     <!--图表渲染-->
     <div id="banReport" class="clearfix" @click=""></div>
@@ -291,7 +292,7 @@
       this.$nextTick(function(){
         setTimeout(() => { // 这个是一个初始化默认值的一个技巧
           _this.addressSlots[0].defaultIndex = 0;
-        }, 100);
+        }, 0);
         // 初始化图表
         // 这里先init一个echarts对象，防止searchByFilter里面调用clear()方法时报错
         _this.chart = echarts.init(document.getElementById('banReport'));
@@ -302,7 +303,6 @@
     watch: {
       // 监听下拉列表值的变化
       showValue(newVal, oldVal) {
-        alert('now: '+ newVal);
         this.searchByFilter();
       }
     }
@@ -340,43 +340,66 @@
     .search-form {
       @include pxrem(width, 700);
       margin: auto;
+      @include pxrem(height, 300);
 
-      .list {
+      .switch-line {
         width: 100%;
-        @include pxrem(height, 110);
-        @include pxrem(padding, 20 0);
+        @include pxrem(height, 84);
+        @include pxrem(margin-bottom, 30);
+        @include pxrem(margin-top, 40);
+        .el-select {
+          padding: 0!important;
+        }
+        input {
+          border: none;
+        }
+      }
+      .list {
+        float: left;
+        @include pxrem(width, 280);
+        @include pxrem(height, 130);
+        @include pxrem(margin-top, 20);
+        @include pxrem(margin-left, 35);
 
         label {
-          display: inline-block;
-          @include pxrem(width, 100);
-          @include pxrem(height, 70);
-          @include pxrem(line-height, 70);
-          text-align: right;
+          display: block;
+          @include pxrem(width, 280);
+          @include pxrem(height, 60);
+          @include pxrem(line-height, 60);
+          text-align: left;
           color: #48576a;
           @include pxrem(font-size, 24);
         }
 
         input {
-          @include pxrem(width, 480);
+          display: block;
+          @include pxrem(width, 280);
           @include pxrem(height, 70);
           border: 1px solid #bfcbd9;
           @include pxrem(border-radius, 5);
-          @include pxrem(margin-left, 10);
+          @include pxrem(padding,3 10);
+        }
+
+        .el-select {
+          display: block;
+          @include pxrem(width, 280);
+          @include pxrem(height, 70);
+          @include pxrem(border-radius, 5);
           @include pxrem(padding,3 10);
         }
       }
+
     }
 
     .search-btn {
-      @include pxrem(width, 480);
+      @include pxrem(width, 595);
       @include pxrem(height, 70);
       @include pxrem(line-height, 70);
       color: #fff;
       background-color: #20a0ff;
       text-align: center;
-      @include pxrem(margin-left,140);
+      @include pxrem(margin,30 auto 30 60);
       @include pxrem(border-radius, 5);
-      @include pxrem(margin-top, 20);
     }
 
     form {
@@ -385,27 +408,12 @@
       @include pxrem(margin, 20 auto);
     }
 
-    .switch-line {
-      width: 100%;
-      @include pxrem(height, 84);
 
-      @include pxrem(margin-bottom, 30);
-      @include pxrem(margin-top, 40);
-
-      label {
-        @include pxrem(margin-left, 20);
-      }
-
-      input {
-        @include pxrem(width, 480);
-      }
-    }
 
     .demo-ruleForm .address.el-row {
       margin-left: -15px!important;
       margin-right: -15px!important;
     }
-
   }
 
   #banReport {
@@ -413,6 +421,10 @@
     margin: auto;
     @include pxrem(height,700);
     /*height: 100%;*/
+  }
+
+  .mint-popup-top {
+    top: 30%;
   }
 
 

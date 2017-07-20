@@ -174,9 +174,9 @@
 
     #zxPannel {
       margin: auto;
-      @include pxrem(margin-top, 100);
+      @include pxrem(margin-top,100);
       width: 96%;
-      @include pxrem(height, 1000);
+      @include pxrem(height, 600);
     }
   }
 </style>
