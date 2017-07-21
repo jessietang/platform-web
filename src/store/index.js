@@ -20,7 +20,57 @@ const state = {
     platformName: '',
     location: '',
     corporation: '' // 所属营运商
-  }
+  },
+  iconItems : [
+    {
+      id: 1,
+      name: '正北方向',
+      direction: './static/img/d1.png',
+      dot: './static/img/icon1.png'
+    },
+    {
+      id: 2,
+      name: '东北方向',
+      direction: './static/img/d2.png',
+      dot: './static/img/icon2.png'
+    },
+    {
+      id: 3,
+      name: '正东方向',
+      direction: './static/img/d3.png',
+      dot: './static/img/icon3.png'
+    },
+    {
+      id: 4,
+      name: '东南方向',
+      direction: './static/img/d4.png',
+      dot: './static/img/icon4.png'
+    },
+    {
+      id: 5,
+      name: '正南方向',
+      direction: './static/img/d5.png',
+      dot: './static/img/icon5.png'
+    },
+    {
+      id: 6,
+      name: '西南方向',
+      direction: './static/img/d6.png',
+      dot: './static/img/icon6.png'
+    },
+    {
+      id: 7,
+      name: '正西方向',
+      direction: './static/img/d7.png',
+      dot: './static/img/icon7.png'
+    },
+    {
+      id: 8,
+      name: '西北方向',
+      direction: './static/img/d8.png',
+      dot: './static/img/icon8.png'
+    }
+  ]
 }
 
 const getters = {

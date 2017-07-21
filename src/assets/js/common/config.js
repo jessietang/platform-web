@@ -6,7 +6,8 @@ const config = () => {
   let rootSrc;
   if (process.env.NODE_ENV !== 'production') { //生产环境
     rootSrc = {
-      api: '/api'
+      //api: 'http://125.71.30.136:8706/'
+      api: '/'
     }
   } else { //正式环境
     rootSrc = {

@@ -6,7 +6,6 @@ import VueRouter from 'vue-router'
 
 const hello = resolve => require(['../components/Hello'], resolve)
 const index = resolve => require(['../components/index/index'], resolve)
-const searchCar = resolve => require(['../components/index/searchCar'], resolve)
 const alarmCar = resolve => require(['../components/index/alarmCar'], resolve)
 const nearCar = resolve => require(['../components/index/nearCar'], resolve)
 const report = resolve => require(['../components/report/index'], resolve)
@@ -60,7 +59,6 @@ export default new VueRouter({
           path: 'index',
           component: index,
           children: [
-            {path: 'searchCar', component: searchCar},
             {path: 'alarmCar', component: alarmCar},
             {
               path: 'nearCar',

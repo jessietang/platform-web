@@ -71,7 +71,12 @@
             //height: 500,     // 信息窗口高度
             title : "信息窗口" , // 信息窗口标题
             enableMessage: true // 设置允许信息窗发送短息
-          }
+          },
+          trackData: [], // 历史轨迹数据（从carTrail.vue传过来的数据）
+          frontPoint: null, // 前一个点
+          marker: null,
+          points: [], // 只保存有经纬度的所有雇几点
+          car: null
         }
       },
       created () {
@@ -80,7 +85,8 @@
       computed: {
         ...mapState([
           'userInfo',
-          'carDetail'
+          'carDetail',
+          'iconItems'
         ]),
       },
       methods: {
@@ -291,6 +297,47 @@
             });
           }
         },
+        // 计算两点之间的距离
+        drawTrackPoint_Distance (sPoint, ePoint) {
+          var _this = this;
+          return _this.map.getDistance(sPoint, ePoint);
+        },
+        //转换度为方向
+        convertDegree (degree) {
+          return parseInt((degree + 23) / 45) % 8;
+        },
+        // 获取不同方向图标的路径 (nType: 1:车辆  2:方向  index:轨迹点索引)
+        getIconPath (nType, index) {
+          var _this = this;
+          var direction = _this.convertDegree(_this.trackData[index]["direction"]);
+          var n = _this.iconItems[direction].id;
+          var d = _this.iconItems[direction].direction;
+          console.log(d);
+          if (nType == 1) {
+            return _this.iconItems[direction].dot;
+          }
+          return d;
+        },
+        addInfoClickEvent (now) {
+          var _this = this;
+          var html = '<div class="map-info-win"><table>' +
+            "<tr><td>所属企业：</td><td>" + _this.carDetail.unitName + '</td></tr>' +
+            "<tr><td>所属营运商：</td><td>" + _this.carDetail.corporation + '</td></tr>' +
+            "<tr><td>速度/限速值：</td><td>" + _this.trackData[now].speedCvt + "/" + _this.trackData[now].limitSpeed + ' km/h</td></tr>' +
+            "<tr><td>车辆类型：</td><td>" + _this.carDetail.carType + '</td></tr>' +
+            "<tr><td>接入平台：</td><td>" + _this.carDetail.platformName + '</td></tr>' +
+            '<tr><td>地址：</td><td>' + _this.trackData[now].location + '</td></tr>' +
+            '<tr><td>定位时间：</td><td>' + _this.trackData[now].gpsDateCvt + '</td></tr>' +
+            '<tr><td>接收时间：</td><td>' + _this.trackData[now].receiveDate + '</td></tr>' +
+            "</table></div>";
+          // 给轨迹上的每一个点绑定点击开启信息窗口的事件
+          _this.marker.addEventListener("click",function(){
+            console.log(now);
+            console.log(_this.trackData[now].location);
+            var infoWindow = new BMap.InfoWindow(html, _this.opts);  // 创建信息窗口对象
+            _this.map.openInfoWindow(infoWindow, _this.points[now]); //开启信息窗口
+          });
+        },
         // 画历史轨迹图
         drawTrack (data, isShow) {
           var _this = this;
@@ -299,26 +346,18 @@
           var centerPoint;
           var car;   //汽车图标
           var label; //信息标签
-          var timer;     //定时器
+          var timer; //定时器
           var index = 0; //记录播放到第几个point
-          var len = data.length;
           var points = [];
-          for(var i in data){
-            points.push(new BMap.Point(data[i].lng, data[i].lat))
+          for (var i in data) {
+            points.push(new BMap.Point(data[i].lng, data[i].lat));
           }
+          _this.trackData = data;
+          _this.points = points;
+
           // 清除地图上的覆盖物
           _this.map.clearOverlays();
-    /*{
-      lng: 114.00250,
-        lat: 22.550340,
-      location: '成都市双流县航空港',
-      direction: '正北方向',
-      SpeedCvt: "60",
-      LimitSpeed: "40",
-      GPSDateCvt: "2017-7-13 13:53:12",
-      receiveDate: "2017-7-13 13:53:30"
-    }*/
-          //通过DrivingRoute获取一条路线的point
+
           // DrivingRoute获取驾车路线规划方案
           var driving = new BMap.DrivingRoute(_this.map); // 当参数为地图实例时，检索位置由地图当前的中心点确定
           driving.search(points[0], points[points.length-1]); //发起检索（起点，终点）
@@ -329,12 +368,9 @@
             _this.map.panTo(centerPoint);
 
             //显示跟踪的图片
-            // Label此类表示地图上的文本标注
-            label = new BMap.Label("", {offset: new BMap.Size(10, -30)});
-            var myIcon = new BMap.Icon("./static/img/directive.png", new BMap.Size(27,27));// 跟踪图标
-            car = new BMap.Marker(points[0], {icon: myIcon}); // 创建Marker实例
-            car.setLabel(label); // 为标注添加文本标注
-            _this.map.addOverlay(car);
+            var myIcon = new BMap.Icon(_this.getIconPath(1,index), new BMap.Size(27,27));// 跟踪图标
+            _this.car = new BMap.Marker(points[0], {icon: myIcon}); // 创建Marker实例
+            _this.map.addOverlay(_this.car);
 
             // 播放
             play();
@@ -346,34 +382,43 @@
               }
               // 点标记跟踪
               if (index > -1 && index < points.length){
-                var html = '<div class="map-info-win"><table>' +
-                  "<tr><td>所属企业：</td><td>" + _this.carDetail.unitName + '</td></tr>' +
-                  "<tr><td>所属营运商：</td><td>" + _this.carDetail.corporation + '</td></tr>' +
-                  "<tr><td>速度/限速值：</td><td>" + data[index].speedCvt + "/" + data[index].limitSpeed + ' km/h</td></tr>' +
-                  "<tr><td>车辆类型：</td><td>" + _this.carDetail.carType + '</td></tr>' +
-                  "<tr><td>接入平台：</td><td>" + _this.carDetail.platformName + '</td></tr>' +
-                  '<tr><td>地址：</td><td>' + data[index].location + '</td></tr>' +
-                  '<tr><td>定位时间：</td><td>' + data[index].gpsDateCvt + '</td></tr>' +
-                  '<tr><td>接收时间：</td><td>' + data[index].receiveDate + '</td></tr>' +
-                  "</table></div>";
+                var now = 0;
                 // 这里的所有点的title都是同一辆车的，所以这里可以这样用
                 _this.opts.title = `<h2 style="font-size:14px;border-bottom: 1px solid #eee;margin-bottom: 10px;">${_this.carDetail.carPlat}${_this.carDetail.carColor}</h2>`;
-                var myIcon2 = new BMap.Icon("./static/img/bullet.png", new BMap.Size(12,12));// 轨迹点标记图标
-                var marker = new BMap.Marker(points[index], {icon: myIcon2}); // 创建Marker实例
-                _this.map.addOverlay(marker);
-                // 给轨迹上的每一个点绑定点击开启信息窗口的事件
-                marker.addEventListener("click",function(){
-                  console.log(point);
-                  var infoWindow = new BMap.InfoWindow(html, _this.opts);  // 创建信息窗口对象
-                  _this.map.openInfoWindow(infoWindow, point); //开启信息窗口
-                });
+                if (index == 0) { // 第一个点，直接添加标注点，然后设置为frontPoint
+                  _this.marker = new BMap.Marker(_this.points[0], {icon: new BMap.Icon("./static/img/bullet.png", new BMap.Size(12,12))});
+                  _this.frontPoint = _this.points[0];
+                  _this.map.addOverlay(_this.marker);
+                  console.log(_this.trackData[index].location);
+                  _this.addInfoClickEvent(index); // 应该是只给添加蓝色点标注的点添加click事件
+                } else {
+                  var distance = _this.drawTrackPoint_Distance(_this.frontPoint, _this.points[index]);
+                  console.log('distance===='+distance);
+                  if (distance > 300 || index === points.length-1) { // 》3000m  标记点的方向 （类似 >>  << 等）
+                    _this.marker = new BMap.Marker(_this.points[index], {icon: new BMap.Icon(_this.getIconPath(2,index), new BMap.Size(20,20))});
+                    _this.map.addOverlay(_this.marker);
+                  }
+                  if (distance > 200) { // 画蓝色标注点
+                    _this.marker = new BMap.Marker(_this.points[index], {icon: new BMap.Icon("./static/img/bullet.png", new BMap.Size(12,12))});
+                    _this.frontPoint = _this.points[index];
+                    _this.map.addOverlay(_this.marker);
+                    console.log(_this.trackData[index].location);
+                    _this.addInfoClickEvent(index); // 应该是只给添加蓝色点标注的点添加click事件
+                  } else {
+                    _this.frontPoint = _this.points[index-1];
+                  }
+                }
+                // 车的图片也时时改变
+                _this.car.setIcon(new BMap.Icon(_this.getIconPath(1, index), new BMap.Size(27,27)));
               }
-              car.setPosition(point); // 设置标注的地理坐标
-              index++;
+              // 不能把绑定click事件放到这里，这样的话，会给每个点都添加click事件，就会出现例如：我点第一个点在第三个点的位置弹出消息。
+              // 应该是只给添加蓝色点标注的点添加click事件
+              _this.car.setPosition(point); // 设置标注的地理坐标
               // 画面跟随
-              //_this.map.panTo(point);
+              _this.map.panTo(point);
+              index++;
               if(index < points.length) {
-                timer = window.setTimeout(play, 300); // 在函数内部通过setTimeout再次调用函数本身，达到setInterval类似的的效果
+                timer = window.setTimeout(play, 500); // 在函数内部通过setTimeout再次调用函数本身，达到setInterval类似的的效果
               } else {
                 _this.map.panTo(point);
               }
