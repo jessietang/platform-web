@@ -27,7 +27,7 @@ export default new VueRouter({
   routes: [
     {
       path: '/',
-      component: web
+      component: login
     },
     // 登录页面
     {

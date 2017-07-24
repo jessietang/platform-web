@@ -1,10 +1,15 @@
 <template lang="html">
     <div id="nearCar">
       <div class="searchBox">
-        <input type="text" class="search-input" placeholder="搜车牌号" v-model="platNum"/>
+        <input type="text" class="search-input" placeholder="搜车牌号" v-model="platNum" @keyup="showList()"/>
         <div class="searchBtn">
           <img src="./img/magnify.png" alt="" id="searchBtn" @click="searchPlat()"/>
         </div>
+        <ul class="resultList" v-if="resultList.length > 0" :class="{'active': isActive}">
+          <li class="list" v-for="list in resultList" @click="selectOne(list)">
+            <span class="platNum">{{list.carPlat}}</span><span class="color">{{list.carColor}}</span>
+          </li>
+        </ul>
       </div>
       <div id="nearMapPannel"></div>
 
@@ -76,7 +81,9 @@
           frontPoint: null, // 前一个点
           marker: null,
           points: [], // 只保存有经纬度的所有雇几点
-          car: null
+          car: null,
+          resultList: [],
+          isActive: false
         }
       },
       created () {
@@ -90,6 +97,82 @@
         ]),
       },
       methods: {
+        showList (){
+          var _this = this;
+          _this.isActive = true;
+          var keyWords = _this.platNum;
+          // 参数：车牌号 、用户id
+          var postData = {
+            text: keyWords,
+            type: 1006,
+            userId: _this.userInfo.userId
+          };
+          axios.get('',postData).then(res => {
+            var res = {
+              "code": 0,
+              "data": [
+                {
+                  lng: _this.myPoint.lng + Math.random() / 100,
+                  lat: _this.myPoint.lat - Math.random() / 1000,
+                  carId: 3,
+                  unitName: "网阔信息3333", // 所属企业
+                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
+                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米",
+                  speedCvt: "60",
+                  limitSpeed: "40",
+                  gpsDateCvt: "2017-6-20 11:59", // 定位时间
+                  receiveDate: "2017-6-20 12:00", // 接收时间
+                  carType: '危险品3',
+                  carColor: '红',
+                  carPlat: '川A2222',
+                  corporation: '成都王阔信息技术股份有限公司'
+                },
+                {
+                  lng: _this.myPoint.lng + Math.random() / 100,
+                  lat: _this.myPoint.lat - Math.random() / 1000,
+                  carId: 3,
+                  unitName: "网阔信息3333", // 所属企业
+                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
+                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米",
+                  speedCvt: "60",
+                  limitSpeed: "40",
+                  gpsDateCvt: "2017-6-20 11:59", // 定位时间
+                  receiveDate: "2017-6-20 12:00", // 接收时间
+                  carType: '危险品3',
+                  carColor: '绿',
+                  carPlat: '川A1111',
+                  corporation: '成都王阔信息技术股份有限公司'
+                },
+                {
+                  lng: _this.myPoint.lng + Math.random() / 100,
+                  lat: _this.myPoint.lat - Math.random() / 1000,
+                  carId: 3,
+                  unitName: "网阔信息3333", // 所属企业
+                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
+                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米",
+                  speedCvt: "60",
+                  limitSpeed: "40",
+                  gpsDateCvt: "2017-6-20 11:59", // 定位时间
+                  receiveDate: "2017-6-20 12:00", // 接收时间
+                  carType: '危险品3',
+                  carColor: '蓝',
+                  carPlat: '川A1234',
+                  corporation: '成都王阔信息技术股份有限公司'
+                }
+              ]
+            };
+            var resultList = res.data;
+            _this.resultList = resultList;
+          });
+        },
+        selectOne (list) {
+          var _this = this;
+          var carPlat = list.carPlat;
+          var carColor = list.carColor;
+          _this.platNum = carPlat + ' ' + carColor;
+          _this.isActive = true;
+          _this.resultList = [];
+        },
         // 获取我的位置并在地图上标记出来
         getMyPosition () {
           var _this = this; // 单独保存this
@@ -220,82 +303,82 @@
         // 精确搜索（一个值）
         searchPlat () {
           var _this = this;
-          var keyWords = _this.platNum;
-          if (keyWords.length < 4) {
-            this.tips = '请至少输入四位要查询的车牌号！';
-            this.tipShow = true;
-            setTimeout(function(){
-              _this.tipShow = false;
-            }, 1000);
-          } else {
-            // 参数：车牌号 、用户id
-            var postData = {
-              platNum: keyWords,
-              userId: _this.userInfo.userId
-            };
-            axios.get('', postData).then(res => {
-              var res = {
-                "code": 0,
-                "data": [
-                  {
-                    lng: _this.myPoint.lng + Math.random() / 100,
-                    lat: _this.myPoint.lat - Math.random() / 1000,
-                    carId: 3,
-                    unitName: "网阔信息3333", // 所属企业
-                    platformName: "成都网阔信息技术股份有限公司", // 接入平台
-                    location: "四川省成都市都江堰市都江堰市徐渡小学西南319米",
-                    speedCvt: "60",
-                    limitSpeed: "40",
-                    gpsDateCvt: "2017-6-20 11:59", // 定位时间
-                    receiveDate: "2017-6-20 12:00", // 接收时间
-                    carType: '危险品3',
-                    carColor: '绿',
-                    carPlat: '川A1234',
-                    corporation: '成都王阔信息技术股份有限公司'
-                  }
-                ]
-              };
-              if (res.code == 0) {
-                if (res.data.length > 0) { // 有结果
-                  var option = res.data[0]; // res.data[0], 不是res.data， 这里注意哦！！！
-                  var myIcon = new BMap.Icon("./static/img/resultCar.png", new BMap.Size(22,33));// 搜索到的车辆定位图标
-                  var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
-                  _this.map.addOverlay(marker);
-                  _this.map.centerAndZoom(new BMap.Point(option.lng,option.lat), 16);
-                  // carDetailObj作为局部变量
-                  var carDetailObj = {
-                    carId: option.carId,
-                    carType: option.carType,
-                    carPlat: option.carPlat,
-                    carColor: option.carColor,
-                    unitName: option.unitName,
-                    platformName: option.platformName,
-                    location: option.location,
-                    corporation: option.corporation // 所属营运商
-                  };
-                  // 搜到结果后就展开车辆的详细信息
-                  _this.isOpenPopUp = true;
-                  // 把车的详细信息保存到store里面,而不是通过query传递，这样防止在切换定位和轨迹的时候丢失数据
-                  _this.$store.dispatch('saveCarInfo', carDetailObj);
-                  _this.$router.push({
-                    path: '/web/index/nearCar/carPosition'
-                  });
-                  _this.addClickHandler(marker, carDetailObj);
-                } else { // 无结果
-                  // 2.无结果
-                  this.tips = '未查询到相关结果！';
-                  this.tipShow = true;
-                  setTimeout(function(){
-                    _this.tipShow = false;
-                  }, 1000);
+          var inputValue = _this.platNum;
+          console.log(inputValue.split(' '));
+          var platNum = inputValue.split(' ')[0] || '';
+          var platColor = inputValue.split(' ')[1] || '';
+          // 参数：车牌号 、用户id
+          var postData = {
+            platNum: platNum,
+            platColor: platColor,
+            userId: _this.userInfo.userId
+          };
+          console.log(postData);
+          axios.get('',postData).then(res => {
+            var res = {
+              "code": 0,
+              "data": [
+                {
+                  lng: _this.myPoint.lng + Math.random() / 100,
+                  lat: _this.myPoint.lat - Math.random() / 1000,
+                  carId: 3,
+                  unitName: "网阔信息3333", // 所属企业
+                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
+                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米",
+                  speedCvt: "60",
+                  limitSpeed: "40",
+                  gpsDateCvt: "2017-6-20 11:59", // 定位时间
+                  receiveDate: "2017-6-20 12:00", // 接收时间
+                  carType: '危险品3',
+                  carColor: '绿',
+                  carPlat: '川A1234',
+                  corporation: '成都王阔信息技术股份有限公司'
                 }
+              ]
+            };
+            if (res.code == 0) {
+              if (res.data.length == 1) {
+                var option = res.data[0]; // res.data[0], 不是res.data， 这里注意哦！！！
+                var myIcon = new BMap.Icon("./static/img/resultCar.png", new BMap.Size(22,33));// 搜索到的车辆定位图标
+                var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
+                _this.map.addOverlay(marker);
+                _this.map.centerAndZoom(new BMap.Point(option.lng,option.lat), 16);
+                // carDetailObj作为局部变量
+                var carDetailObj = {
+                  carId: option.carId,
+                  carType: option.carType,
+                  carPlat: option.carPlat,
+                  carColor: option.carColor,
+                  unitName: option.unitName,
+                  platformName: option.platformName,
+                  location: option.location,
+                  corporation: option.corporation // 所属营运商
+                };
+                // 搜到结果后就展开车辆的详细信息
+                _this.isOpenPopUp = true;
+                // 把车的详细信息保存到store里面,而不是通过query传递，这样防止在切换定位和轨迹的时候丢失数据
+                _this.$store.dispatch('saveCarInfo', carDetailObj);
+                _this.$router.push({
+                  path: '/web/index/nearCar/carPosition'
+                });
+                _this.addClickHandler(marker, carDetailObj);
+              } else if (res.data.length > 1) {
+                this.tips = '请准确选择一辆车进行信息查看！';
+                this.tipShow = true;
+                setTimeout(function(){
+                  _this.tipShow = false;
+                }, 1000);
               } else {
-                console.log(res.msg);
+                this.tips = '暂无查询结果！';
+                this.tipShow = true;
+                setTimeout(function(){
+                  _this.tipShow = false;
+                }, 1000);
               }
-            }).catch(error => {
-              console.log(error);
-            });
-          }
+            }
+          }).catch(error => {
+            console.log(error);
+          });
         },
         // 计算两点之间的距离
         drawTrackPoint_Distance (sPoint, ePoint) {
@@ -448,7 +531,7 @@
 
     .searchBox {
       position: absolute;
-      z-index: 10;
+      z-index: 1001;
       @include pxrem(width, 650);
       @include pxrem(height, 100);
       @include pxrem(top, 40);
@@ -479,6 +562,38 @@
           @include pxrem(width, 60);
           @include pxrem(height, 60);
         }
+      }
+
+      .resultList {
+        display: none;
+        width: 100%;
+        height: auto;
+        position: absolute;
+        background-color: #fff;
+        .list {
+          width: 100%;
+          @include pxrem(height, 70);
+          @include pxrem(line-height, 70);
+          border: 1px solid #eee;
+          border-top: none;
+          @include pxrem(padding, 0 20);
+
+          .color {
+            @include pxrem(margin-left, 10);
+          }
+
+          .carId {
+            display: none;
+          }
+        }
+        .list:hover {
+          background-color: #eee;
+          cursor: pointer;
+        }
+      }
+
+      .resultList.active {
+        display: block;
       }
     }
     .popUp {

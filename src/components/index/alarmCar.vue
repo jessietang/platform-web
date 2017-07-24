@@ -1,10 +1,15 @@
 <template lang="html">
     <div id="alarmCar">
       <div class="searchBox">
-        <input type="text" class="search-input" placeholder="搜车牌号" v-model="platNum"/>
+        <input type="text" class="search-input" placeholder="搜车牌号" v-model="platNum" @keyup="showList()"/>
         <div class="searchBtn">
           <img src="./img/magnify.png" alt="" id="searchBtn" @click="searchPlat()"/>
         </div>
+        <ul class="resultList" v-if="resultList.length > 0" :class="{'active': isActive}">
+          <li class="list" v-for="list in resultList" @click="selectOne(list)">
+            <span class="platNum">{{list.carPlat}}</span><span class="color">{{list.carColor}}</span>
+          </li>
+        </ul>
       </div>
       <div id="alarmMapPanel"></div>
 
@@ -31,7 +36,9 @@
             //height: 500,     // 信息窗口高度
             title : "信息窗口" , // 信息窗口标题
             enableMessage:true//设置允许信息窗发送短息
-          }
+          },
+          resultList: [],
+          isActive: false
         }
       },
       computed: {
@@ -40,6 +47,174 @@
         ]),
       },
       methods: {
+        // 模糊查找
+        showList (){
+          var _this = this;
+          _this.isActive = true;
+          var keyWords = _this.platNum;
+          // 参数：车牌号 、用户id
+          var postData = {
+            text: keyWords,
+            type: 1006,
+            userId: _this.userInfo.userId
+          };
+          axios.get('',postData).then(res => {
+            var res = {
+              "code": 0,
+              "data": [
+                {
+                  carId: 0, // 车辆id
+                  carPlat: '川A5434', // 车牌号
+                  carColor: '绿', // 车颜色
+                  alarmType: "疲劳驾驶", // 报警类型
+                  lng: _this.myPoint.lng + Math.random() / 100, // 纬度
+                  lat: _this.myPoint.lat - Math.random() / 1000, // 经度
+                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米", // 最新位置
+                  unitName: "网阔信息111", // 所属企业
+                  corporation: '成都王阔信息技术股份有限公司', // 所属营运商
+                  speedCvt: "60", // 速度值
+                  limitSpeed: "40", // 限速值
+                  carType: '危险品3', // 车辆类型
+                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
+                  gpsDateCvt: "2017-6-20 12:00", // 定位时间
+                  receiveDate: '2017-6-20 12:01' // 接收时间
+                },
+                {
+                  carId: 0, // 车辆id
+                  carPlat: '川A0000', // 车牌号
+                  carColor: '蓝', // 车颜色
+                  alarmType: "疲劳驾驶", // 报警类型
+                  lng: _this.myPoint.lng + Math.random() / 100, // 纬度
+                  lat: _this.myPoint.lat - Math.random() / 1000, // 经度
+                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米", // 最新位置
+                  unitName: "网阔信息111", // 所属企业
+                  corporation: '成都王阔信息技术股份有限公司', // 所属营运商
+                  speedCvt: "60", // 速度值
+                  limitSpeed: "40", // 限速值
+                  carType: '危险品3', // 车辆类型
+                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
+                  gpsDateCvt: "2017-6-20 12:00", // 定位时间
+                  receiveDate: '2017-6-20 12:01' // 接收时间
+                },
+                {
+                  carId: 0, // 车辆id
+                  carPlat: '川A1234', // 车牌号
+                  carColor: '红', // 车颜色
+                  alarmType: "疲劳驾驶", // 报警类型
+                  lng: _this.myPoint.lng + Math.random() / 100, // 纬度
+                  lat: _this.myPoint.lat - Math.random() / 1000, // 经度
+                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米", // 最新位置
+                  unitName: "网阔信息111", // 所属企业
+                  corporation: '成都王阔信息技术股份有限公司', // 所属营运商
+                  speedCvt: "60", // 速度值
+                  limitSpeed: "40", // 限速值
+                  carType: '危险品3', // 车辆类型
+                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
+                  gpsDateCvt: "2017-6-20 12:00", // 定位时间
+                  receiveDate: '2017-6-20 12:01' // 接收时间
+                },
+              ]
+            };
+            var resultList = res.data;
+            _this.resultList = resultList;
+          });
+        },
+        selectOne (list) {
+          var _this = this;
+          var carPlat = list.carPlat;
+          var carColor = list.carColor;
+          _this.platNum = carPlat + ' ' + carColor;
+          _this.isActive = true;
+          _this.resultList = [];
+        },
+        // 精准搜索报警车辆
+        searchPlat () {
+          var _this = this;
+          var inputValue = _this.platNum;
+          var platNum = inputValue.split(' ')[0] || '';
+          var platColor = inputValue.split(' ')[1] || '';
+          // 参数：车牌号 、车牌颜色、用户id
+          var postData = {
+            platNum: platNum,
+            platColor: platColor,
+            userId: _this.userInfo.userId
+          };
+          console.log(postData);
+          axios.get('', postData).then(res => {
+            var res = {
+              "code": 0,
+              "data": [
+                {
+                  carId: 0, // 车辆id
+                  carPlat: '川A5434', // 车牌号
+                  carColor: '绿', // 车颜色
+                  alarmType: "疲劳驾驶", // 报警类型
+                  lng: _this.myPoint.lng + Math.random() / 100, // 纬度
+                  lat: _this.myPoint.lat - Math.random() / 1000, // 经度
+                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米", // 最新位置
+                  unitName: "网阔信息111", // 所属企业
+                  corporation: '成都王阔信息技术股份有限公司', // 所属营运商
+                  speedCvt: "60", // 速度值
+                  limitSpeed: "40", // 限速值
+                  carType: '危险品3', // 车辆类型
+                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
+                  gpsDateCvt: "2017-6-20 12:00", // 定位时间
+                  receiveDate: '2017-6-20 12:01' // 接收时间
+                }
+              ]
+            };
+            if (res.code == 0) {
+              if (res.data.length == 1) { // 有数据，搜索有结果
+                var option = res.data[0];
+                var myIcon = new BMap.Icon("./static/img/resultCar.png", new BMap.Size(22,33));// 搜索到的车辆定位图标
+                var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
+                _this.map.addOverlay(marker);
+                _this.map.centerAndZoom(new BMap.Point(option.lng,option.lat), 16);
+                var carDetailObj = {
+                  carId: option.carId,
+                  carType: option.carType,
+                  carPlat: option.carPlat,
+                  carColor: option.carColor,
+                  unitName: option.unitName,
+                  platformName: option.platformName,
+                  location: option.location,
+                  corporation: option.corporation
+                };
+                var html = '<div class="map-info-win"><table>' +
+                  "<tr><td>所属企业：</td><td>" + option.unitName + '</td></tr>' +
+                  "<tr><td>所属接入平台：</td><td>" + option.platformName + '</td></tr>' +
+                  '<tr><td>地址：</td><td>' + option.location + '</td></tr>' +
+                  "<tr><td>速度/限速值：</td><td>" + option.speedCvt + "/" + option.limitSpeed + ' km/h</td></tr>' +
+                  '<tr><td>报警类型：</td><td>' + option.alarmType + '</td></tr>' +
+                  '<tr><td>报警时间：</td><td>' + option.gpsDateCvt + '</td></tr>' +
+                  "</table></div>";
+                var title = `<h2 style="font-size:14px;border-bottom:1px solid #eee;margin-bottom: 10px;">${option.carPlat}${option.carColor}</h2>`;
+                // 查询到的结果直接在页面上通过infoWindow显示出来
+                _this.opts.title = title;
+                var infoWindow = new BMap.InfoWindow(html, _this.opts);  // 创建信息窗口对象
+                _this.map.openInfoWindow(infoWindow,new BMap.Point(option.lng,option.lat)); //开启信息窗口
+
+                _this.addClickHandler(html,marker,new BMap.Point(option.lng,option.lat),title);
+              } else if (res.data.length > 1) { // 查出有多辆车
+                this.tips = '请准确选择一辆车进行信息查看！';
+                this.tipShow = true;
+                setTimeout(function(){
+                  _this.tipShow = false;
+                }, 1000);
+              } else {
+                this.tips = '未查询到相关结果！';
+                this.tipShow = true;
+                setTimeout(function(){
+                  _this.tipShow = false;
+                }, 1000);
+              }
+            } else {
+              console.log(res.msg);
+            }
+          }).catch(error => {
+            console.log(error);
+          });
+        },
         getMyPosition () {
           var _this = this; // 单独保存this
           this.map = new BMap.Map("alarmMapPanel");    // 创建Map实例
@@ -160,92 +335,7 @@
             _this.map.openInfoWindow(infoWindow,point); //开启信息窗口
           });
         },
-        // 精准搜索报警车辆
-        searchPlat () {
-          var _this = this;
-          var keyWords = this.platNum;
-          if (keyWords.length < 4) {
-            this.tips = '请至少输入四位要查询的车牌号！';
-            this.tipShow = true;
-            setTimeout(function(){
-              _this.tipShow = false;
-            }, 1000);
-          } else {
-            // 参数: 车牌号、用户id
-            var postData = {
-              platNum: keyWords,
-              userId: _this.userInfo.userId
-            };
-            axios.get('', postData).then(res => {
-              var res = {
-                "code": 0,
-                "data": [
-                  {
-                    carId: 0, // 车辆id
-                    carPlat: '川A5434', // 车牌号
-                    carColor: '绿', // 车颜色
-                    alarmType: "疲劳驾驶", // 报警类型
-                    lng: _this.myPoint.lng + Math.random() / 100, // 纬度
-                    lat: _this.myPoint.lat - Math.random() / 1000, // 经度
-                    location: "四川省成都市都江堰市都江堰市徐渡小学西南319米", // 最新位置
-                    unitName: "网阔信息111", // 所属企业
-                    corporation: '成都王阔信息技术股份有限公司', // 所属营运商
-                    speedCvt: "60", // 速度值
-                    limitSpeed: "40", // 限速值
-                    carType: '危险品3', // 车辆类型
-                    platformName: "成都网阔信息技术股份有限公司", // 接入平台
-                    gpsDateCvt: "2017-6-20 12:00", // 定位时间
-                    receiveDate: '2017-6-20 12:01' // 接收时间
-                  }
-                ]
-              };
-              if (res.code == 0) {
-                if (res.data.length > 0) { // 有数据，搜索有结果
-                  var option = res.data[0];
-                  var myIcon = new BMap.Icon("./static/img/resultCar.png", new BMap.Size(22,33));// 搜索到的车辆定位图标
-                  var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
-                  _this.map.addOverlay(marker);
-                  _this.map.centerAndZoom(new BMap.Point(option.lng,option.lat), 16);
-                  var carDetailObj = {
-                    carId: option.carId,
-                    carType: option.carType,
-                    carPlat: option.carPlat,
-                    carColor: option.carColor,
-                    unitName: option.unitName,
-                    platformName: option.platformName,
-                    location: option.location,
-                    corporation: option.corporation
-                  };
-                  var html = '<div class="map-info-win"><table>' +
-                    "<tr><td>所属企业：</td><td>" + option.unitName + '</td></tr>' +
-                    "<tr><td>所属接入平台：</td><td>" + option.platformName + '</td></tr>' +
-                    '<tr><td>地址：</td><td>' + option.location + '</td></tr>' +
-                    "<tr><td>速度/限速值：</td><td>" + option.speedCvt + "/" + option.limitSpeed + ' km/h</td></tr>' +
-                    '<tr><td>报警类型：</td><td>' + option.alarmType + '</td></tr>' +
-                    '<tr><td>报警时间：</td><td>' + option.gpsDateCvt + '</td></tr>' +
-                    "</table></div>";
-                  var title = `<h2 style="font-size:14px;border-bottom:1px solid #eee;margin-bottom: 10px;">${option.carPlat}${option.carColor}</h2>`;
-                  // 查询到的结果直接在页面上通过infoWindow显示出来
-                  _this.opts.title = title;
-                  var infoWindow = new BMap.InfoWindow(html, _this.opts);  // 创建信息窗口对象
-                  _this.map.openInfoWindow(infoWindow,new BMap.Point(option.lng,option.lat)); //开启信息窗口
 
-                  _this.addClickHandler(html,marker,new BMap.Point(option.lng,option.lat),title);
-                } else { // 无数据，搜索无结果
-                  this.tips = '未查询到相关结果！';
-                  this.tipShow = true;
-                  setTimeout(function(){
-                    _this.tipShow = false;
-                  }, 1000);
-                }
-              } else {
-                console.log(res.msg);
-              }
-            }).catch(error => {
-              console.log(error);
-            });
-          }
-        }
       },
       mounted () {
         var _this = this;
@@ -295,6 +385,38 @@
           @include pxrem(width, 60);
           @include pxrem(height, 60);
         }
+      }
+
+      .resultList {
+        display: none;
+        width: 100%;
+        height: auto;
+        position: absolute;
+        background-color: #fff;
+        .list {
+          width: 100%;
+          @include pxrem(height, 70);
+          @include pxrem(line-height, 70);
+          border: 1px solid #eee;
+          border-top: none;
+          @include pxrem(padding, 0 20);
+
+          .color {
+            @include pxrem(margin-left, 10);
+          }
+
+          .carId {
+            display: none;
+          }
+        }
+      .list:hover {
+        background-color: #eee;
+        cursor: pointer;
+      }
+      }
+
+      .resultList.active {
+        display: block;
       }
 
     }
