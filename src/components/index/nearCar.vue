@@ -1,13 +1,13 @@
 <template lang="html">
     <div id="nearCar">
       <div class="searchBox">
-        <input type="text" class="search-input" placeholder="搜车牌号" v-model="platNum" @keyup="showList()"/>
+        <input type="text" class="search-input" placeholder="搜车牌号" v-model="platNum" @keyup="showList()" @focus="showList()"/>
         <div class="searchBtn">
           <img src="./img/magnify.png" alt="" id="searchBtn" @click="searchPlat()"/>
         </div>
         <ul class="resultList" v-if="resultList.length > 0" :class="{'active': isActive}">
           <li class="list" v-for="list in resultList" @click="selectOne(list)">
-            <span class="platNum">{{list.carPlat}}</span><span class="color">{{list.carColor}}</span>
+            <span class="platNum">{{list.Name}}</span>
           </li>
         </ul>
       </div>
@@ -83,15 +83,12 @@
           points: [], // 只保存有经纬度的所有雇几点
           car: null,
           resultList: [],
-          isActive: false
+          isActive: false,
+          userInfo: this.$store.state.userInfo
         }
-      },
-      created () {
-        console.log(this.userInfo);
       },
       computed: {
         ...mapState([
-          'userInfo',
           'carDetail',
           'iconItems'
         ]),
@@ -104,72 +101,42 @@
           // 参数：车牌号 、用户id
           var postData = {
             text: keyWords,
-            type: 1006,
+            type: 1002, // 车的类型
             userId: _this.userInfo.userId
           };
-          axios.get('',postData).then(res => {
-            var res = {
+          console.log(postData);
+          // 发get请求 （这里要注意传参的方式，通过params对象传递参数）
+          axios.get('/api/autocomplete',{params: postData}).then(res => {
+            /*var res = {
               "code": 0,
               "data": [
                 {
-                  lng: _this.myPoint.lng + Math.random() / 100,
-                  lat: _this.myPoint.lat - Math.random() / 1000,
-                  carId: 3,
-                  unitName: "网阔信息3333", // 所属企业
-                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
-                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米",
-                  speedCvt: "60",
-                  limitSpeed: "40",
-                  gpsDateCvt: "2017-6-20 11:59", // 定位时间
-                  receiveDate: "2017-6-20 12:00", // 接收时间
-                  carType: '危险品3',
-                  carColor: '红',
-                  carPlat: '川A2222',
-                  corporation: '成都王阔信息技术股份有限公司'
+                  Name: '川A1111|黄',
+                  Id: 12345
                 },
                 {
-                  lng: _this.myPoint.lng + Math.random() / 100,
-                  lat: _this.myPoint.lat - Math.random() / 1000,
-                  carId: 3,
-                  unitName: "网阔信息3333", // 所属企业
-                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
-                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米",
-                  speedCvt: "60",
-                  limitSpeed: "40",
-                  gpsDateCvt: "2017-6-20 11:59", // 定位时间
-                  receiveDate: "2017-6-20 12:00", // 接收时间
-                  carType: '危险品3',
-                  carColor: '绿',
-                  carPlat: '川A1111',
-                  corporation: '成都王阔信息技术股份有限公司'
+                  Name: '川A2222|红',
+                  Id: 2222
                 },
                 {
-                  lng: _this.myPoint.lng + Math.random() / 100,
-                  lat: _this.myPoint.lat - Math.random() / 1000,
-                  carId: 3,
-                  unitName: "网阔信息3333", // 所属企业
-                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
-                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米",
-                  speedCvt: "60",
-                  limitSpeed: "40",
-                  gpsDateCvt: "2017-6-20 11:59", // 定位时间
-                  receiveDate: "2017-6-20 12:00", // 接收时间
-                  carType: '危险品3',
-                  carColor: '蓝',
-                  carPlat: '川A1234',
-                  corporation: '成都王阔信息技术股份有限公司'
-                }
+                  Name: '川A3333|绿',
+                  Id: 3333
+                },
+                {
+                  Name: '川A4444|蓝',
+                  Id: 4444
+                },
               ]
-            };
+            };*/
+            var res = JSON.parse(res.data);
+            console.log(res);
             var resultList = res.data;
             _this.resultList = resultList;
           });
         },
         selectOne (list) {
           var _this = this;
-          var carPlat = list.carPlat;
-          var carColor = list.carColor;
-          _this.platNum = carPlat + ' ' + carColor;
+          _this.platNum = list.Name;
           _this.isActive = true;
           _this.resultList = [];
         },
@@ -196,8 +163,10 @@
               _this.map.centerAndZoom(r.point, 16);
               console.log('您的位置：'+r.point.lng+','+r.point.lat);
               // 保存我的位置信息
-              _this.myPoint.lng = r.point.lng;
-              _this.myPoint.lat = r.point.lat;
+              console.log('=====我的位置====');
+              // 传给后台的经纬度要进行转换（Int）
+              _this.myPoint.lng = ((r.point.lng) * 1000000).toFixed(0);
+              _this.myPoint.lat = ((r.point.lat) * 1000000).toFixed(0);
               console.log(_this.myPoint);
               // 获取附近的车的信息并标记在地图上
               _this.getNearPosition();
@@ -212,14 +181,16 @@
           var _this = this;
           // 参数：我的lng、lat, userId
           var postData = {
+            //lng: _this.myPoint.lng,
+            //lat: _this.myPoint.lat,
             lng: _this.myPoint.lng,
             lat: _this.myPoint.lat,
             userId:_this.userInfo.userId
           };
           console.log(postData);
 
-          axios.get('', postData).then(res => {
-            var res = {
+          axios.post('/api/Vehicle/QueryVehicleInfoNear', postData).then(res => {
+            /*var res = {
               "code": 0,
               "data": [
                 {
@@ -255,13 +226,17 @@
                   corporation: '成都王阔信息技术股份有限公司'
                 }
               ]
-            };
+            };*/
+            console.log(res);
+            var res = JSON.parse(res.data);
             if (res.code == 0) {
               if (res.data.length > 0) { // 有数据
                 var nearData = res.data;
                 for (let i in nearData) {
                   var option = nearData[i];
-                  console.log(option);
+                  // 拿到的经纬度要进行转换
+                  option.lng = parseFloat(option.lng) / 1000000;
+                  option.lat = parseFloat(option.lat) / 1000000;
                   var myIcon = new BMap.Icon("./static/img/nearCar.png", new BMap.Size(36,36));// 附近的车辆定位图标
                   let marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
                   _this.map.addOverlay(marker);
@@ -276,7 +251,7 @@
                     location: option.location,
                     corporation: option.corporation
                   };
-                  console.log(carDetailObj);
+                  //console.log(carDetailObj);
                   _this.addClickHandler(marker, carDetailObj);
                 }
               } else { // 无数据
@@ -303,19 +278,15 @@
         // 精确搜索（一个值）
         searchPlat () {
           var _this = this;
-          var inputValue = _this.platNum;
-          console.log(inputValue.split(' '));
-          var platNum = inputValue.split(' ')[0] || '';
-          var platColor = inputValue.split(' ')[1] || '';
-          // 参数：车牌号 、用户id
+          var platNum = _this.platNum;
+          // 参数：车牌号车牌颜色(作为一个整体)、用户id
           var postData = {
             platNum: platNum,
-            platColor: platColor,
             userId: _this.userInfo.userId
           };
           console.log(postData);
-          axios.get('',postData).then(res => {
-            var res = {
+          axios.post('/api/Vehicle/QueryVehicleInfo',postData).then(res => {
+            /*var res = {
               "code": 0,
               "data": [
                 {
@@ -335,10 +306,14 @@
                   corporation: '成都王阔信息技术股份有限公司'
                 }
               ]
-            };
+            };*/
+            var res = JSON.parse(res.data);
             if (res.code == 0) {
               if (res.data.length == 1) {
                 var option = res.data[0]; // res.data[0], 不是res.data， 这里注意哦！！！
+                option.lat = (option.lat) / 1000000;
+                option.lng = (option.lng) / 1000000;
+                console.log(option);
                 var myIcon = new BMap.Icon("./static/img/resultCar.png", new BMap.Size(22,33));// 搜索到的车辆定位图标
                 var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
                 _this.map.addOverlay(marker);
@@ -363,18 +338,25 @@
                 });
                 _this.addClickHandler(marker, carDetailObj);
               } else if (res.data.length > 1) {
-                this.tips = '请准确选择一辆车进行信息查看！';
-                this.tipShow = true;
+                _this.tips = '请从下拉框里准确选择一辆车进行信息查看！';
+                _this.tipShow = true;
                 setTimeout(function(){
                   _this.tipShow = false;
                 }, 1000);
               } else {
-                this.tips = '暂无查询结果！';
-                this.tipShow = true;
+                _this.tips = '暂无查询结果！';
+                _this.tipShow = true;
                 setTimeout(function(){
                   _this.tipShow = false;
                 }, 1000);
               }
+            }else {
+              console.log(res.msg || '未知错误！');
+              _this.tips = '请从下拉框里准确选择一辆车进行信息查看！';
+              _this.tipShow = true;
+              setTimeout(function(){
+                _this.tipShow = false;
+              }, 1000);
             }
           }).catch(error => {
             console.log(error);
@@ -663,7 +645,7 @@
               @include pxrem(margin-left,10);
               .plateNum {
                 display: inline-block;
-                width: 60%;
+                width: 70%;
                 text-align: center;
               }
             }

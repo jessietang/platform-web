@@ -7,11 +7,11 @@ const config = () => {
   if (process.env.NODE_ENV !== 'production') { //生产环境
     rootSrc = {
       //api: 'http://125.71.30.136:8706/'
-      api: '/'
+      api: 'http://125.71.30.136/AppWebApi'
     }
   } else { //正式环境
     rootSrc = {
-      api:`http://${window.location.host}/truck/`
+      api:`http://125.71.30.136/AppWebApi`
     }
   }
   window.rootSrc = rootSrc

@@ -30,10 +30,10 @@ module.exports = {
     // 跨域设置(只适用于开发环境)
     proxyTable: {
       '/api': {
-        target:'http://jsonplaceholder.typicode.com',
+        target: 'http://125.71.30.136/AppWebApi',
         changeOrigin: true,
         pathRewrite: {
-          '^/api': ''
+          '^/api': '/'
         }
       }
     },

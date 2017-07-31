@@ -10,7 +10,7 @@
     <ul class="search-form clearfix">
       <li class="list">
         <label for="">地区</label>
-        <input type="text" @click="showPopUp()" v-model="searchPlace" placeholder="点击选择地区"/>
+        <input type="text" @click="showPopUp()" v-model="searchPlace" placeholder="四川省"/>
       </li>
       <li class="list">
         <label for="">服务商</label>
@@ -39,7 +39,7 @@
 
 
     <!--图表渲染-->
-    <div id="banReport" class="clearfix" @click=""></div>
+    <div id="banReport" class="clearfix" ></div>
   </div>
 </template>
 <script lang="babel">
@@ -164,18 +164,18 @@
         // 参数 : 地区id、详细地址、服务商、企业、展示方式、用户id
         var postData = {
           zoneId: zoneId,
-          searchPlace: searchPlace,
+          //searchPlace: searchPlace,
           serviceProvider: serviceProvider,
           companyName: companyName,
           nowSelect: nowSelect,
           userId: userId
         };
-        axios.get('', postData).then(res => {
+        axios.post('/api/Online/QueryOnlineTotal', postData).then(res => {
           // 返回数据：
           // 1根据展示方式，返回地区ID、服务商ID、企业ID
           // 2根据展示方式，返回地区名称、服务商名称、企业名称
           // 3在线数、入网数、车辆总数
-          var res = {
+          /*var res = {
             "code": 0,
             "data": [
               {zId: 100, yName: '成都市', zxNum: 220, rwNum: 1200, zsNum: 2220},
@@ -186,17 +186,22 @@
               {zId: 105, yName: '自贡市', zxNum: 232, rwNum: 1302, zsNum: 1282},
               {zId: 106, yName: '成都市', zxNum: 220, rwNum: 1200, zsNum: 2220}
             ]
-          };
+          };*/
+          var res = JSON.parse(res.data);
           if (res.code == 0) {
             if (res.data.length > 0) { // 有数据
-              var data = res.data;
+              var data = res.data.reverse(); // 让成都的显示在最后，及柱形图的最上面那个
               var yData = [], // 纵坐标，数据项名称
                 zxData = [], // 在线数
                 rwData = [], // 入网数
                 zsData = [], // 车辆总数
                 dataSelectId = []; // 地区ID、服务商ID、企业ID
               for (var i in data) {
-                yData.push(data[i].yName);
+                if (data[i].yName.length > 5) {
+                  yData.push(data[i].yName.substring(0,5));
+                } else {
+                  yData.push(data[i].yName);
+                }
                 zxData.push(data[i].zxNum);
                 rwData.push(data[i].rwNum);
                 zsData.push(data[i].zsNum);
@@ -235,23 +240,21 @@
         this.chart = echarts.init(document.getElementById(id));
         this.chart.setOption({
           tooltip : {
-            trigger: 'axis',
-            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-              type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-            }
+            trigger: 'axis'
+          },
+          legend: {
+            data:['在线数', '入网数','车辆总数']
           },
           grid: {
             x: '0', // 距离左边距离
             y: '10%',// 距离顶部距离
             containLabel: true
           },
-          legend: {
-            data:['在线数', '入网数','车辆总数']
-          },
           calculable : true,
           xAxis : [
             {
-              type : 'value'
+              type : 'value',
+              //max: '230000'
             }
           ],
           yAxis : [
@@ -264,23 +267,17 @@
             {
               name:'在线数',
               type:'bar',
-              stack: '总量',
-              itemStyle : { normal: {label : {show: true, position: 'insideRight'}}},
-              data: this.zxData
+              data:this.zxData
             },
             {
               name:'入网数',
               type:'bar',
-              stack: '总量',
-              itemStyle : { normal: {label : {show: true, position: 'insideRight'}}},
-              data: this.rwData
+              data:this.rwData
             },
             {
               name:'车辆总数',
               type:'bar',
-              stack: '总量',
-              itemStyle : { normal: {label : {show: true, position: 'insideRight'}}},
-              data: this.zsData
+              data:this.zsData
             }
           ]
         })
@@ -419,7 +416,7 @@
   #banReport {
     width: 98%;
     margin: auto;
-    @include pxrem(height,700);
+    @include pxrem(height,1100);
     /*height: 100%;*/
   }
 

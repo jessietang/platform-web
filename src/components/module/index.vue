@@ -52,13 +52,14 @@
           var postData = {
             userId: _this.userInfo.userId
           };
-          axios.get('',postData).then(res => {
-            var res = {
+          axios.post('/api/Industry/QueryIndustryCount',postData).then(res => {
+            /*var res = {
               "code": 0,
               "data": [
                 {zxNum: 110, zgNum: 119, platformAll: 3456}
               ]
-            };
+            };*/
+            var res = JSON.parse(res.data);
             if (res.code == 0) {
               if (res.data.length > 0) {
                 var data = res.data[0];

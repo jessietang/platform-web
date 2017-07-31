@@ -53,9 +53,9 @@
             nowSelect: nowSelect,
             userId: userId
           };
-          axios.get('',postData).then(res => {
+          axios.post('/api/Online/QueryOnlineDetail',postData).then(res => {
             // 返回数据：选择项id、车辆类型、在线数、入网数、车辆总数
-            var res = {
+            /*var res = {
               "code": 0,
               "data": [
                 {zId: 0, carType: '三类以上班线客车',zxNum: 200, rwNum: 90, zsNum: 300},
@@ -63,7 +63,8 @@
                 {zId: 0, carType: '危险品运输车',zxNum: 102, rwNum: 70, zsNum: 300},
                 {zId: 0, carType: '重型货运运输车',zxNum: 123, rwNum: 98, zsNum: 900}
               ]
-            };
+            };*/
+            var res = JSON.parse(res.data);
             if (res.code == 0) {
               if (res.data.length > 0) { // 有数据
                 var data = res.data;
@@ -87,6 +88,11 @@
                   },
                   legend: {
                     data: ['在线数','入网数', '车辆总数']
+                  },
+                  grid: {
+                    x: '0', // 距离左边距离
+                    y: '10%',// 距离顶部距离
+                    containLabel: true
                   },
                   calculable : true,
                   xAxis : [

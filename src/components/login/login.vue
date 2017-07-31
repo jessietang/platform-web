@@ -259,11 +259,10 @@
         // 处理登录
         doLogin () {
           var _this = this;
-          var username = this.username;
-          var password = this.password;
-          var _this = this;
+          var username = _this.username;
+          var password = _this.password;
           if (username !== '' && password !== '') {
-            if (password.length < 32) {
+            if (password && password.length < 32) {
               _this.password = _this.md5(password);
             }
             // 参数： 用户名、密码
@@ -272,11 +271,12 @@
               password: _this.password
             };
             console.log(postData);
-            axios.get('',postData).then(res => {
-              var res = {
+            axios.post('/api/Account/Login',postData).then(res => {
+              /*var res = {
                 "code": 0,
                 "data": [{"userId": "123", "zoneId": "1111"}]
-              };
+              };*/
+              var res = JSON.parse(res.data);
               if (res.code == 0) {
                 if (res.data.length > 0) { // 验证通过
                   var data = res.data;
@@ -304,8 +304,8 @@
                     path: '/web/index/nearCar'
                   });
                 } else { // 验证不通过
-                  this.errorTip = '用户名或密码错误！';
-                  this.isError = true;
+                  _this.errorTip = '用户名或密码错误！';
+                  _this.isError = true;
                   setTimeout(function(){
                     _this.isError = false;
                   },1000);
@@ -317,8 +317,8 @@
                 console.log(error);
             });
           } else {
-            this.errorTip = '用户名或密码不能为空！';
-            this.isError = true;
+            _this.errorTip = '用户名或密码不能为空！';
+            _this.isError = true;
             setTimeout(function(){
               _this.isError = false;
             },1000);

@@ -46,9 +46,9 @@
             userId: _this.query.userId
           };
           console.log(postData);
-          axios.get('', postData).then(res => {
+          axios.post('/api/Platform/QueryPlatformAlarmPlocCnt', postData).then(res => {
             // 返回数据：接入平台id, 小时， 定位数， 报警数
-            var res = {
+            /*var res = {
               "code": 0,
               "data": [
                 {platFormId: 0, platHour: 0, posNum:11118, alarmNum: 1118},
@@ -63,7 +63,8 @@
                 {platFormId: 9, platHour: 9, posNum:1632, alarmNum: 1231},
                 {platFormId: 10, platHour: 10, posNum:1118, alarmNum: 1118}
               ]
-            };
+            };*/
+            var res = JSON.parse(res.data);
             if (res.code == 0) {
               if (res.data.length > 0) {
                 var data = res.data;

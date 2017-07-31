@@ -1,13 +1,13 @@
 <template lang="html">
     <div id="alarmCar">
       <div class="searchBox">
-        <input type="text" class="search-input" placeholder="搜车牌号" v-model="platNum" @keyup="showList()"/>
+        <input type="text" class="search-input" placeholder="搜车牌号" v-model="platNum" @keyup="showList()" @focus="showList()"/>
         <div class="searchBtn">
           <img src="./img/magnify.png" alt="" id="searchBtn" @click="searchPlat()"/>
         </div>
         <ul class="resultList" v-if="resultList.length > 0" :class="{'active': isActive}">
           <li class="list" v-for="list in resultList" @click="selectOne(list)">
-            <span class="platNum">{{list.carPlat}}</span><span class="color">{{list.carColor}}</span>
+            <span class="platNum">{{list.Name}}</span>
           </li>
         </ul>
       </div>
@@ -55,93 +55,55 @@
           // 参数：车牌号 、用户id
           var postData = {
             text: keyWords,
-            type: 1006,
+            type: 1002, // 车的类型
             userId: _this.userInfo.userId
           };
-          axios.get('',postData).then(res => {
-            var res = {
+          // 发get请求
+          axios.get('/api/autocomplete',{params: postData}).then(res => {
+            /*var res = {
               "code": 0,
               "data": [
                 {
-                  carId: 0, // 车辆id
-                  carPlat: '川A5434', // 车牌号
-                  carColor: '绿', // 车颜色
-                  alarmType: "疲劳驾驶", // 报警类型
-                  lng: _this.myPoint.lng + Math.random() / 100, // 纬度
-                  lat: _this.myPoint.lat - Math.random() / 1000, // 经度
-                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米", // 最新位置
-                  unitName: "网阔信息111", // 所属企业
-                  corporation: '成都王阔信息技术股份有限公司', // 所属营运商
-                  speedCvt: "60", // 速度值
-                  limitSpeed: "40", // 限速值
-                  carType: '危险品3', // 车辆类型
-                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
-                  gpsDateCvt: "2017-6-20 12:00", // 定位时间
-                  receiveDate: '2017-6-20 12:01' // 接收时间
+                  Name: '川A1111|黄',
+                  Id: 12345
                 },
                 {
-                  carId: 0, // 车辆id
-                  carPlat: '川A0000', // 车牌号
-                  carColor: '蓝', // 车颜色
-                  alarmType: "疲劳驾驶", // 报警类型
-                  lng: _this.myPoint.lng + Math.random() / 100, // 纬度
-                  lat: _this.myPoint.lat - Math.random() / 1000, // 经度
-                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米", // 最新位置
-                  unitName: "网阔信息111", // 所属企业
-                  corporation: '成都王阔信息技术股份有限公司', // 所属营运商
-                  speedCvt: "60", // 速度值
-                  limitSpeed: "40", // 限速值
-                  carType: '危险品3', // 车辆类型
-                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
-                  gpsDateCvt: "2017-6-20 12:00", // 定位时间
-                  receiveDate: '2017-6-20 12:01' // 接收时间
+                  Name: '川A2222|红',
+                  Id: 2222
                 },
                 {
-                  carId: 0, // 车辆id
-                  carPlat: '川A1234', // 车牌号
-                  carColor: '红', // 车颜色
-                  alarmType: "疲劳驾驶", // 报警类型
-                  lng: _this.myPoint.lng + Math.random() / 100, // 纬度
-                  lat: _this.myPoint.lat - Math.random() / 1000, // 经度
-                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米", // 最新位置
-                  unitName: "网阔信息111", // 所属企业
-                  corporation: '成都王阔信息技术股份有限公司', // 所属营运商
-                  speedCvt: "60", // 速度值
-                  limitSpeed: "40", // 限速值
-                  carType: '危险品3', // 车辆类型
-                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
-                  gpsDateCvt: "2017-6-20 12:00", // 定位时间
-                  receiveDate: '2017-6-20 12:01' // 接收时间
+                  Name: '川A3333|绿',
+                  Id: 3333
+                },
+                {
+                  Name: '川A4444|蓝',
+                  Id: 4444
                 },
               ]
-            };
+            };*/
+            var res = JSON.parse(res.data);
             var resultList = res.data;
             _this.resultList = resultList;
           });
         },
         selectOne (list) {
           var _this = this;
-          var carPlat = list.carPlat;
-          var carColor = list.carColor;
-          _this.platNum = carPlat + ' ' + carColor;
+          _this.platNum = list.Name;
           _this.isActive = true;
           _this.resultList = [];
         },
         // 精准搜索报警车辆
         searchPlat () {
           var _this = this;
-          var inputValue = _this.platNum;
-          var platNum = inputValue.split(' ')[0] || '';
-          var platColor = inputValue.split(' ')[1] || '';
-          // 参数：车牌号 、车牌颜色、用户id
+          var platNum = _this.platNum;
+          // 参数：车牌号车牌颜色(作为一个整体)、用户id
           var postData = {
             platNum: platNum,
-            platColor: platColor,
             userId: _this.userInfo.userId
           };
           console.log(postData);
-          axios.get('', postData).then(res => {
-            var res = {
+          axios.post('/api/Vehicle/QueryAlarmVehicleInfo', postData).then(res => {
+            /*var res = {
               "code": 0,
               "data": [
                 {
@@ -162,10 +124,13 @@
                   receiveDate: '2017-6-20 12:01' // 接收时间
                 }
               ]
-            };
+            };*/
+            var res = JSON.parse(res.data);
             if (res.code == 0) {
               if (res.data.length == 1) { // 有数据，搜索有结果
                 var option = res.data[0];
+                option.lat = (option.lat) / 1000000;
+                option.lng = (option.lng) / 1000000;
                 var myIcon = new BMap.Icon("./static/img/resultCar.png", new BMap.Size(22,33));// 搜索到的车辆定位图标
                 var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
                 _this.map.addOverlay(marker);
@@ -196,19 +161,24 @@
 
                 _this.addClickHandler(html,marker,new BMap.Point(option.lng,option.lat),title);
               } else if (res.data.length > 1) { // 查出有多辆车
-                this.tips = '请准确选择一辆车进行信息查看！';
-                this.tipShow = true;
+                _this.tips = '请从下拉框里准确选择一辆车进行信息查看！';
+                _this.tipShow = true;
                 setTimeout(function(){
                   _this.tipShow = false;
                 }, 1000);
               } else {
-                this.tips = '未查询到相关结果！';
-                this.tipShow = true;
+                _this.tips = '未查询到相关结果！';
+                _this.tipShow = true;
                 setTimeout(function(){
                   _this.tipShow = false;
                 }, 1000);
               }
             } else {
+              _this.tips = '请从下拉框里准确选择一辆车进行信息查看！';
+              _this.tipShow = true;
+              setTimeout(function(){
+                _this.tipShow = false;
+              }, 1000);
               console.log(res.msg);
             }
           }).catch(error => {
@@ -237,8 +207,10 @@
               _this.map.centerAndZoom(r.point, 16);
               console.log('您的位置：'+r.point.lng+','+r.point.lat);
               // 保存我的位置信息
-              _this.myPoint.lng = r.point.lng;
-              _this.myPoint.lat = r.point.lat;
+              console.log('=====我的位置====');
+              // 传给后台的经纬度要进行转换（Int）
+              _this.myPoint.lng = ((r.point.lng) * 1000000).toFixed(0);
+              _this.myPoint.lat = ((r.point.lat) * 1000000).toFixed(0);
               console.log(_this.myPoint);
               // 获取附近的报警的车的信息并标记在地图上
               _this.getAlarmPoint();
@@ -257,8 +229,8 @@
             lat:  _this.myPoint.lat,
             userId: _this.userInfo.userId
           };
-          axios.get('', postData).then(res => {
-            var res = {
+          axios.post('/api/Vehicle/QueryAlarmVehicleInfoNear', postData).then(res => {
+            /*var res = {
               "code": 0,
               "data": [
                 {
@@ -296,13 +268,17 @@
                   receiveDate: '2017-6-20 12:01' // 接收时间
                 }
               ]
-            };
+            };*/
+            var res = JSON.parse(res.data);
             if (res.code == 0) {
               if (res.data.length > 0) { // 有数据，附近有车
                 var nearData = res.data;
                 for (var i in nearData) {
                   var option = nearData[i];
                   console.log(option);
+                  // 拿到的经纬度要进行转换
+                  option.lng = parseFloat(option.lng) / 1000000;
+                  option.lat = parseFloat(option.lat) / 1000000;
                   var myIcon = new BMap.Icon("./static/img/alarmCar.png", new BMap.Size(24,24));// 搜索到的车辆定位图标
                   var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
                   _this.map.addOverlay(marker);

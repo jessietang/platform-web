@@ -33,13 +33,14 @@
         var postData = {
           userId: _this.userInfo.userId
         };
-        axios.get('', postData).then(res => {
-          var res = {
+        axios.post('/api/Supervise/QueryAlarmSupervisionCount', postData).then(res => {
+          /*var res = {
             "code": 0,
             "data": [
               {yingC: 500, yiC: 335, yingLc: 400, yiLc: 310, yingCx: 300, yiCx: 234, yingLx: 150, yiLx: 135}
             ]
-          };
+          };*/
+          var res = JSON.parse(res.data);
           if (res.code == 0) {
             if (res.data.length > 0) { // 有数据
               var data = res.data[0];

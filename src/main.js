@@ -22,9 +22,9 @@ import './assets/js/lib/flexible' // 通过js来动态改写meta标签
 window.axios = axios
 
 //let AUTH_TOKEN = 'amVzc2lldGFuZyswOTI1' // base64编码 jessietang+0925 (用户名+密码) AUTH_TOKEN是请求头里面的一个权限参数
-axios.defaults.baseURL = rootSrc.api // config.js里面配置
+//axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+axios.defaults.baseURL = rootSrc.api; // config.js里面配置
 //axios.defaults.headers.common['Authorization'] = AUTH_TOKEN
-//axios.defaults.headers.post['Content-Type'] = 'application/json'
 
 Vue.use(ElementUi)
 

@@ -125,8 +125,8 @@
                 endDate: ed,
                 endTime: et
               };
-              axios.get('', postData).then(res => {
-                var res = {
+              axios.post('/api/Vehicle/QueryVehicleHistory', postData).then(res => {
+                /*var res = {
                   "code": 0,
                   "data": [
                     {
@@ -230,10 +230,20 @@
                       receiveDate: "2017-7-13 13:34:30"
                     }
                   ]
-                };
+                };*/
+                var res = JSON.parse(res.data);
                 if (res.code == 0) {
                   if (res.data.length > 0) { // 有数据，有历史轨迹
                     var trackData = res.data;
+                    console.log('111');
+                    console.log(trackData);
+                    // 经纬度数据转换成地图上可显示的了再传给其他组件
+                    for (var i=0; i<trackData.length; i++) {
+                      trackData[i].lng = parseFloat(trackData[i].lng) / 1000000;
+                      trackData[i].lat = parseFloat(trackData[i].lat) / 1000000;
+                    }
+                    console.log('222');
+                    console.log(trackData);
                     _this.isShow = false;
                     _this.$emit('drawTrack', trackData, _this.isShow); // 触发父组件的自定义事件
                   } else { // 无数据，无历史轨迹

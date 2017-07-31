@@ -74,9 +74,9 @@
           var postData = {
             userId: _this.userInfo.userId
           };
-          axios.get('', postData).then(res => {
+          axios.post('/api/Platform/QueryPlatformSupervise', postData).then(res => {
             // 返回数据：接入平台id, 接入平台，主链路通断情况、从链路通断情况
-            var res = {
+            /*var res = {
               "code": 0,
               "data": [
                 {
@@ -98,7 +98,8 @@
                   platName: '四川安吉北斗卫星定位监控平台'
                 }
               ]
-            };
+            };*/
+            var res = JSON.parse(res.data);
             if (res.code == 0) {
               if (res.data.length > 0) { // 有数据
                 var receiveLinkData = res.data;
