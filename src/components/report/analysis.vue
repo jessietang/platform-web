@@ -21,15 +21,22 @@
           </div>
         </li>
       </ul>
+      <loadingComp v-if="isLoadingShow" v-bind:loadingTip="loadingTip"></loadingComp>
     </div>
 </template>
 <script lang="babel">
     import echarts from 'echarts'
     import axios from 'axios'
     import {mapState} from 'vuex'
+    import loadingComp from '../loadingComp/index'
     export default {
+      components: {
+        loadingComp
+      },
       data () {
         return {
+          isLoadingShow: false,
+          loadingTip: '', // 加载的提示文字
           linkData: []
         }
       },
@@ -42,6 +49,16 @@
         ])
       },
       methods: {
+        ajaxLoader (tip) {
+          var _this = this;
+          _this.isLoadingShow = true;
+          _this.loadingTip = tip;
+        },
+        ajaxComplete () {
+          var _this = this;
+          _this.isLoadingShow = false;
+          _this.loadingTip = '';
+        },
         getZhuType (zhuType) {
           if (zhuType === 0) { // 通
             return './static/img/linkTong.png'
@@ -74,60 +91,87 @@
           var postData = {
             userId: _this.userInfo.userId
           };
-          axios.post('/api/Platform/QueryPlatformSupervise', postData).then(res => {
-            // 返回数据：接入平台id, 接入平台，主链路通断情况、从链路通断情况
-            /*var res = {
-              "code": 0,
-              "data": [
-                {
-                  platFormId: 0,
-                  zhuType: 0, // 连接
-                  congType: 0, // 连接
-                  platName: '安达通卫星定位服务平台'
-                },
-                {
-                  platFormId: 1,
-                  zhuType: 0, // 连接
-                  congType: 1, // 断开
-                  platName: '神州导航智慧北斗道路运输监控平台'
-                },
-                {
-                  platFormId: 2,
-                  zhuType: 1, // 断开
-                  congType: 1, // 断开
-                  platName: '四川安吉北斗卫星定位监控平台'
-                }
-              ]
-            };*/
-            var res = JSON.parse(res.data);
-            if (res.code == 0) {
-              if (res.data.length > 0) { // 有数据
-                var receiveLinkData = res.data;
-                // 按照断开在前连接在后排序后再展示
-                var linkData = [];
-                var dd = [], // 都断
-                  dl = [], // 一个断一个连
-                  ll = []; // 都连
-                for (var i in receiveLinkData) {
-                  if (receiveLinkData[i].zhuType === 1 && receiveLinkData[i].congType === 1) {
-                    dd.push(receiveLinkData[i]);
-                  } else if ((receiveLinkData[i].zhuType === 1 && receiveLinkData[i].congType === 0) || (receiveLinkData[i].zhuType === 0 && receiveLinkData[i].congType === 1)) {
-                    dl.push(receiveLinkData[i]);
-                  } else if (receiveLinkData[i].zhuType === 0 && receiveLinkData[i].congType === 0) {
-                    ll.push(receiveLinkData[i]);
-                  }
-                }
-                linkData = [].concat(dd, dl, ll);
-                _this.linkData = linkData;
-              } else {
-                console.log('暂无数据');
+          var receiveLinkData = sessionStorage.getItem('receiveLinkData') && JSON.parse(JSON.parse(sessionStorage.getItem('receiveLinkData'))).data;
+          console.log('==========');
+          console.log(receiveLinkData);
+          console.log('==========');
+          if (receiveLinkData !== null && receiveLinkData.length > 0){ // 有缓存数据
+            // 按照断开在前连接在后排序后再展示
+            var linkData = [];
+            var dd = [], // 都断
+              dl = [], // 一个断一个连
+              ll = []; // 都连
+            for (var i in receiveLinkData) {
+              if (receiveLinkData[i].zhuType === 1 && receiveLinkData[i].congType === 1) {
+                dd.push(receiveLinkData[i]);
+              } else if ((receiveLinkData[i].zhuType === 1 && receiveLinkData[i].congType === 0) || (receiveLinkData[i].zhuType === 0 && receiveLinkData[i].congType === 1)) {
+                dl.push(receiveLinkData[i]);
+              } else if (receiveLinkData[i].zhuType === 0 && receiveLinkData[i].congType === 0) {
+                ll.push(receiveLinkData[i]);
               }
-            } else {
-              console.log(res.msg);
             }
-          }).catch(error => {
-            console.log(error);
-          });
+            linkData = [].concat(dd, dl, ll);
+            _this.linkData = linkData;
+          } else {
+            _this.ajaxLoader('数据正在加载中，请稍候！');
+            axios.post('/api/Platform/QueryPlatformSupervise', postData).then(res => {
+              _this.ajaxComplete();
+              // 返回数据：接入平台id, 接入平台，主链路通断情况、从链路通断情况
+              /*var res = {
+               "code": 0,
+               "data": [
+               {
+               platFormId: 0,
+               zhuType: 0, // 连接
+               congType: 0, // 连接
+               platName: '安达通卫星定位服务平台'
+               },
+               {
+               platFormId: 1,
+               zhuType: 0, // 连接
+               congType: 1, // 断开
+               platName: '神州导航智慧北斗道路运输监控平台'
+               },
+               {
+               platFormId: 2,
+               zhuType: 1, // 断开
+               congType: 1, // 断开
+               platName: '四川安吉北斗卫星定位监控平台'
+               }
+               ]
+               };*/
+              sessionStorage.setItem('receiveLinkData',JSON.stringify(res.data)); // 进行数据缓存
+              console.log(sessionStorage.getItem('receiveLinkData'));
+              var res = JSON.parse(res.data);
+              if (res.code == 0) {
+                if (res.data.length > 0) { // 有数据
+                  var receiveLinkData = res.data;
+                  // 按照断开在前连接在后排序后再展示
+                  var linkData = [];
+                  var dd = [], // 都断
+                    dl = [], // 一个断一个连
+                    ll = []; // 都连
+                  for (var i in receiveLinkData) {
+                    if (receiveLinkData[i].zhuType === 1 && receiveLinkData[i].congType === 1) {
+                      dd.push(receiveLinkData[i]);
+                    } else if ((receiveLinkData[i].zhuType === 1 && receiveLinkData[i].congType === 0) || (receiveLinkData[i].zhuType === 0 && receiveLinkData[i].congType === 1)) {
+                      dl.push(receiveLinkData[i]);
+                    } else if (receiveLinkData[i].zhuType === 0 && receiveLinkData[i].congType === 0) {
+                      ll.push(receiveLinkData[i]);
+                    }
+                  }
+                  linkData = [].concat(dd, dl, ll);
+                  _this.linkData = linkData;
+                } else {
+                  console.log('暂无数据');
+                }
+              } else {
+                console.log(res.msg);
+              }
+            }).catch(error => {
+              console.log(error);
+            });
+          }
         }
       },
       mounted () {

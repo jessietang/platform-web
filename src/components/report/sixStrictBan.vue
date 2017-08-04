@@ -33,13 +33,14 @@
         </el-select>
       </li>
     </ul>
-    <div class="search-btn" @click="searchByFilter()">查询</div>
+    <div class="search-btn" @click="searchData()">查询</div>
 
 
 
 
     <!--图表渲染-->
-    <div id="banReport" class="clearfix" ></div>
+    <div id="banReport" class="clearfix"></div>
+    <loadingComp v-if="isLoadingShow" v-bind:loadingTip="loadingTip"></loadingComp>
   </div>
 </template>
 <script lang="babel">
@@ -47,9 +48,15 @@
   import axios from 'axios'
   import s from '../../assets/js/lib/address3.json'
   import {mapState} from 'vuex'
+  import loadingComp from '../loadingComp/index'
   export default {
+    components: {
+      loadingComp
+    },
     data () {
       return {
+        isLoadingShow: false,
+        loadingTip: '',
         popupVisible: false,
         // 查询条件数据
         addressSlots: [
@@ -105,7 +112,7 @@
         zxData: [], // 在线数
         rwData: [], // 入网数
         zsData: [], // 车辆总数
-        dataSelectId: [] // 地区ID、服务商ID、企业ID
+        dataSelectId: [], // 地区ID、服务商ID、企业ID
       }
     },
     computed: {
@@ -114,6 +121,15 @@
       ])
     },
     methods: {
+      ajaxLoader (tip) {
+        var _this = this;
+        _this.isLoadingShow = true;
+        _this.loadingTip = tip;
+      },
+      ajaxComplete () {
+        var _this = this;
+        _this.isLoadingShow = false;
+      },
       // 控制popup的显示隐藏
       showPopUp () {
         this.popupVisible = true;
@@ -151,6 +167,11 @@
         this.searchPlace = this.addressProvince + this.addressCity + this.addressXian;
         picker.setSlotValues(2, xian); // 把县的集合赋给第三个value
       },
+      searchData () {
+        var _this = this;
+        sessionStorage.removeItem('onlineData'+_this.showValue); // 清空之前的缓存
+        _this.searchByFilter();
+      },
       // 条件搜索
       searchByFilter () {
         var _this = this;
@@ -170,70 +191,115 @@
           nowSelect: nowSelect,
           userId: userId
         };
-        axios.post('/api/Online/QueryOnlineTotal', postData).then(res => {
-          // 返回数据：
-          // 1根据展示方式，返回地区ID、服务商ID、企业ID
-          // 2根据展示方式，返回地区名称、服务商名称、企业名称
-          // 3在线数、入网数、车辆总数
-          /*var res = {
-            "code": 0,
-            "data": [
-              {zId: 100, yName: '成都市', zxNum: 220, rwNum: 1200, zsNum: 2220},
-              {zId: 101, yName: '自贡市', zxNum: 232, rwNum: 1302, zsNum: 1282},
-              {zId: 102, yName: '成都市', zxNum: 220, rwNum: 1200, zsNum: 2220},
-              {zId: 103, yName: '自贡市', zxNum: 232, rwNum: 1302, zsNum: 1282},
-              {zId: 104, yName: '成都市', zxNum: 220, rwNum: 1200, zsNum: 2220},
-              {zId: 105, yName: '自贡市', zxNum: 232, rwNum: 1302, zsNum: 1282},
-              {zId: 106, yName: '成都市', zxNum: 220, rwNum: 1200, zsNum: 2220}
-            ]
-          };*/
-          var res = JSON.parse(res.data);
-          if (res.code == 0) {
-            if (res.data.length > 0) { // 有数据
-              var data = res.data.reverse(); // 让成都的显示在最后，及柱形图的最上面那个
-              var yData = [], // 纵坐标，数据项名称
-                zxData = [], // 在线数
-                rwData = [], // 入网数
-                zsData = [], // 车辆总数
-                dataSelectId = []; // 地区ID、服务商ID、企业ID
-              for (var i in data) {
-                if (data[i].yName.length > 5) {
-                  yData.push(data[i].yName.substring(0,5));
-                } else {
-                  yData.push(data[i].yName);
-                }
-                zxData.push(data[i].zxNum);
-                rwData.push(data[i].rwNum);
-                zsData.push(data[i].zsNum);
-                dataSelectId.push(data[i].zId);
-              }
-              _this.yData = yData; // 纵坐标，数据项名称
-              _this.zxData = zxData; // 在线数
-              _this.rwData = rwData; // 入网数
-              _this.zsData = zsData; // 车辆总数
-              _this.dataSelectId = dataSelectId; // 地区ID、服务商ID、企业ID
-              _this.chart.clear(); //每次画图之前都先清除掉之前的 清空图表
-              _this.drawPie('banReport'); // 清除完再画
-              // 绑定点击事件
-              _this.chart.on('click', function(param){
-                var index = param.dataIndex;
-                var dataId = _this.dataSelectId[index]; // 选择项id
-                _this.$router.push({
-                  path: '/zxDetail',
-                  query: {
-                    dataId: dataId,
-                    nowSelect: nowSelect,
-                    userId: userId
-                  }
-                });
-              });
+        var data = sessionStorage.getItem('onlineData'+nowSelect) && (JSON.parse(JSON.parse(sessionStorage.getItem('onlineData'+nowSelect))).data).reverse();
+        console.log(data);
+        if (data && data.length > 0) { // 有缓存
+          var yData = [], // 纵坐标，数据项名称
+            zxData = [], // 在线数
+            rwData = [], // 入网数
+            zsData = [], // 车辆总数
+            dataSelectId = []; // 地区ID、服务商ID、企业ID
+          for (var i in data) {
+            if (data[i].yName.length > 5) {
+              yData.push(data[i].yName.substring(0,5));
+            } else {
+              yData.push(data[i].yName);
             }
-          } else {
-            console.log(res.msg);
+            zxData.push(data[i].zxNum);
+            rwData.push(data[i].rwNum);
+            zsData.push(data[i].zsNum);
+            dataSelectId.push(data[i].zId);
           }
-        }).catch(error => {
-          console.log(error);
-        });
+          _this.yData = yData; // 纵坐标，数据项名称
+          _this.zxData = zxData; // 在线数
+          _this.rwData = rwData; // 入网数
+          _this.zsData = zsData; // 车辆总数
+          _this.dataSelectId = dataSelectId; // 地区ID、服务商ID、企业ID
+          _this.chart.clear(); //每次画图之前都先清除掉之前的 清空图表
+          _this.drawPie('banReport'); // 清除完再画
+          // 绑定点击事件
+          _this.chart.on('click', function(param){
+            var index = param.dataIndex;
+            var dataId = _this.dataSelectId[index]; // 选择项id
+            _this.$router.push({
+              path: '/zxDetail',
+              query: {
+                dataId: dataId,
+                nowSelect: nowSelect,
+                userId: userId
+              }
+            });
+          });
+        } else {
+          _this.ajaxLoader('数据正在加载中,请稍候！');
+          axios.post('/api/Online/QueryOnlineTotal', postData).then(res => {
+            // 返回数据：
+            // 1根据展示方式，返回地区ID、服务商ID、企业ID
+            // 2根据展示方式，返回地区名称、服务商名称、企业名称
+            // 3在线数、入网数、车辆总数
+            /*var res = {
+             "code": 0,
+             "data": [
+             {zId: 100, yName: '成都市', zxNum: 220, rwNum: 1200, zsNum: 2220},
+             {zId: 101, yName: '自贡市', zxNum: 232, rwNum: 1302, zsNum: 1282},
+             {zId: 102, yName: '成都市', zxNum: 220, rwNum: 1200, zsNum: 2220},
+             {zId: 103, yName: '自贡市', zxNum: 232, rwNum: 1302, zsNum: 1282},
+             {zId: 104, yName: '成都市', zxNum: 220, rwNum: 1200, zsNum: 2220},
+             {zId: 105, yName: '自贡市', zxNum: 232, rwNum: 1302, zsNum: 1282},
+             {zId: 106, yName: '成都市', zxNum: 220, rwNum: 1200, zsNum: 2220}
+             ]
+             };*/
+            _this.ajaxComplete();
+            sessionStorage.setItem('onlineData'+nowSelect,JSON.stringify(res.data)); // 动态缓存数据（）
+            console.log(sessionStorage.getItem('onlineData'+nowSelect));
+            var res = JSON.parse(res.data);
+            if (res.code == 0) {
+              if (res.data.length > 0) { // 有数据
+                var data = res.data.reverse(); // 让成都的显示在最后，及柱形图的最上面那个
+                var yData = [], // 纵坐标，数据项名称
+                  zxData = [], // 在线数
+                  rwData = [], // 入网数
+                  zsData = [], // 车辆总数
+                  dataSelectId = []; // 地区ID、服务商ID、企业ID
+                for (var i in data) {
+                  if (data[i].yName.length > 5) {
+                    yData.push(data[i].yName.substring(0,5));
+                  } else {
+                    yData.push(data[i].yName);
+                  }
+                  zxData.push(data[i].zxNum);
+                  rwData.push(data[i].rwNum);
+                  zsData.push(data[i].zsNum);
+                  dataSelectId.push(data[i].zId);
+                }
+                _this.yData = yData; // 纵坐标，数据项名称
+                _this.zxData = zxData; // 在线数
+                _this.rwData = rwData; // 入网数
+                _this.zsData = zsData; // 车辆总数
+                _this.dataSelectId = dataSelectId; // 地区ID、服务商ID、企业ID
+                _this.chart.clear(); //每次画图之前都先清除掉之前的 清空图表
+                _this.drawPie('banReport'); // 清除完再画
+                // 绑定点击事件
+                _this.chart.on('click', function(param){
+                  var index = param.dataIndex;
+                  var dataId = _this.dataSelectId[index]; // 选择项id
+                  _this.$router.push({
+                    path: '/zxDetail',
+                    query: {
+                      dataId: dataId,
+                      nowSelect: nowSelect,
+                      userId: userId
+                    }
+                  });
+                });
+              }
+            } else {
+              console.log(res.msg);
+            }
+          }).catch(error => {
+            console.log(error);
+          });
+        }
       },
       // 图表绘制
       drawPie (id) {
@@ -423,6 +489,7 @@
   .mint-popup-top {
     top: 30%;
   }
+
 
 
 

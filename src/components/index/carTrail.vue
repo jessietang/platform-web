@@ -40,6 +40,7 @@
 </template>
 <script lang="babel">
   import {mapState} from 'vuex'
+  import $ from 'n-zepto'
     export default {
       data () {
         return {
@@ -105,7 +106,7 @@
               setTimeout(function(){
                 _this.tipShow = false;
               }, 1000);
-            }else {
+            } else {
               // 发请求
               var sd = _this.formatDate(_this.startTime); // 开始日期
               var st = _this.formateTime(_this.startTime); // 开始时间
@@ -125,13 +126,15 @@
                 endDate: ed,
                 endTime: et
               };
+              _this.tipShow = true;
+              _this.tips = '正在加载历史轨迹数据，请稍候！'; // 数据加载完成之前的提示，避免用户一直点
               axios.post('/api/Vehicle/QueryVehicleHistory', postData).then(res => {
                 /*var res = {
                   "code": 0,
                   "data": [
                     {
-                      lng: 114.00100,
-                      lat: 22.550000,
+                      lng: 114001000,
+                      lat: 22550000,
                       location: '成都市双流县航空港1',
                       direction: 23, // 这里的方向是个数值
                       speedCvt: "60",
@@ -140,8 +143,8 @@
                       receiveDate: "2017-7-13 13:53:30"
                     },
                     {
-                      lng: 114.00130,
-                      lat: 22.550000,
+                      lng: 114001300,
+                      lat: 22550000,
                       location: '成都市双流县航空港2',
                       direction: 41,
                       speedCvt: "60",
@@ -150,8 +153,8 @@
                       receiveDate: "2017-7-13 14:10:30"
                     },
                     {
-                      lng: 114.00160,
-                      lat: 22.550000,
+                      lng: 114001600,
+                      lat: 22550000,
                       location: '成都市双流县航空港3',
                       direction: 16,
                       speedCvt: "60",
@@ -160,8 +163,8 @@
                       receiveDate: "2017-7-13 15:20:30"
                     },
                     {
-                      lng: 114.00510,
-                      lat: 22.550000,
+                      lng: 114005100,
+                      lat: 22550000,
                       location: '成都市双流县航空港4',
                       direction: 32,
                       speedCvt: "60",
@@ -170,8 +173,28 @@
                       receiveDate: "2017-7-13 16:53:30"
                     },
                     {
-                      lng: 114.00537,
-                      lat: 22.549500,
+                      lng: 114005100,
+                      lat: 22560000,
+                      location: '成都市双流县航空港41',
+                      direction: 32,
+                      speedCvt: "60",
+                      limitSpeed: "40",
+                      gpsDateCvt: "2017-7-13 16:53:12",
+                      receiveDate: "2017-7-13 16:53:30"
+                    },
+                    {
+                      lng: 114005100,
+                      lat: 22570000,
+                      location: '成都市双流县航空港41',
+                      direction: 32,
+                      speedCvt: "60",
+                      limitSpeed: "40",
+                      gpsDateCvt: "2017-7-13 16:53:12",
+                      receiveDate: "2017-7-13 16:53:30"
+                    },
+                    {
+                      lng: 114005370,
+                      lat: 22549500,
                       location: '成都市双流县航空港5',
                       direction: 61,
                       speedCvt: "60",
@@ -180,8 +203,8 @@
                       receiveDate: "2017-7-13 13:34:30"
                     },
                     {
-                      lng: 114.00507,
-                      lat: 22.548400,
+                      lng: 114005070,
+                      lat: 22548400,
                       location: '成都市双流县航空港6',
                       direction: 18,
                       speedCvt: "60",
@@ -190,8 +213,8 @@
                       receiveDate: "2017-7-13 13:34:30"
                     },
                     {
-                      lng: 114.00557,
-                      lat: 22.545000,
+                      lng: 114005570,
+                      lat: 22545000,
                       location: '成都市双流县航空港7',
                       direction: '54',
                       speedCvt: "60",
@@ -200,8 +223,8 @@
                       receiveDate: "2017-7-13 13:34:30"
                     },
                     {
-                      lng: 114.00867,
-                      lat: 22.556000,
+                      lng: 114008670,
+                      lat: 22556000,
                       location: '成都市双流县航空港8',
                       direction: 23,
                       speedCvt: "60",
@@ -210,8 +233,8 @@
                       receiveDate: "2017-7-13 13:34:30"
                     },
                     {
-                      lng: 114.00067,
-                      lat: 22.556000,
+                      lng: 114000370,
+                      lat: 22556000,
                       location: '成都市双流县航空港9',
                       direction: 832,
                       speedCvt: "60",
@@ -220,8 +243,8 @@
                       receiveDate: "2017-7-13 13:34:30"
                     },
                     {
-                      lng: 114.00000,
-                      lat: 22.548000,
+                      lng: 114000000,
+                      lat: 22548000,
                       location: '成都市双流县航空港10',
                       direction: 22,
                       speedCvt: "60",
@@ -231,6 +254,7 @@
                     }
                   ]
                 };*/
+                _this.tipShow = true;
                 var res = JSON.parse(res.data);
                 if (res.code == 0) {
                   if (res.data.length > 0) { // 有数据，有历史轨迹
@@ -288,6 +312,17 @@
           var allS = h * 3600 + m * 60 + s;
           return allS;
         }
+      },
+      mounted () {
+        var _this = this;
+        _this.$nextTick(function(){
+          $('.el-input input').attr("readonly","readonly");
+          $('.el-input input').on('focus', function(){
+            console.log('focus');
+            $('.el-picker-panel__body-wrapper input.el-input__inner').attr("readonly","readonly");
+          })
+        });
+
       }
     }
 </script>

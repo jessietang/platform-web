@@ -19,7 +19,8 @@ const state = {
     unitName: '',
     platformName: '',
     location: '',
-    corporation: '' // 所属营运商
+    corporation: '', // 所属营运商
+    gpsDateCvt: '' // 最后定位时间
   },
   iconItems : [
     {
@@ -88,6 +89,7 @@ const mutations = {
     state.carDetail.platformName = carDetailObj.platformName;
     state.carDetail.location = carDetailObj.location;
     state.carDetail.corporation = carDetailObj.corporation;
+    state.carDetail.gpsDateCvt = carDetailObj.gpsDateCvt;
   }
 }
 

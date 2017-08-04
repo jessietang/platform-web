@@ -15,14 +15,21 @@
 
       <!--tips-->
       <div class="tips" v-if="tipShow">{{tips}}</div>
+      <loadingComp v-if="isLoadingShow" v-bind:loadingTip="loadingTip"></loadingComp>
     </div>
 </template>
 <script lang="babel">
   import {mapState} from 'vuex'
   import axios from 'axios'
+  import loadingComp from '../loadingComp/index'
     export default {
+      components: {
+        loadingComp
+      },
       data () {
         return {
+          isLoadingShow: false,
+          loadingTip: '', // 加载的提示文字
           platNum: '', // 搜索的车牌号关键词
           myPoint: {
             lng: 0, // 纬度
@@ -47,6 +54,16 @@
         ]),
       },
       methods: {
+        ajaxLoader (tip) {
+          var _this = this;
+          _this.isLoadingShow = true;
+          _this.loadingTip = tip;
+        },
+        ajaxComplete () {
+          var _this = this;
+          _this.isLoadingShow = false;
+          _this.loadingTip = '';
+        },
         // 模糊查找
         showList (){
           var _this = this;
@@ -229,79 +246,106 @@
             lat:  _this.myPoint.lat,
             userId: _this.userInfo.userId
           };
-          axios.post('/api/Vehicle/QueryAlarmVehicleInfoNear', postData).then(res => {
-            /*var res = {
-              "code": 0,
-              "data": [
-                {
-                  carId: 0, // 车辆id
-                  carPlat: '川A5434', // 车牌号
-                  carColor: '红', // 车颜色
-                  alarmType: "超速", // 报警类型
-                  lng: _this.myPoint.lng + Math.random() / 100, // 纬度
-                  lat: _this.myPoint.lat - Math.random() / 1000, // 经度
-                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米", // 最新位置
-                  unitName: "网阔信息111", // 所属企业
-                  corporation: '成都王阔信息技术股份有限公司', // 所属营运商
-                  speedCvt: "60", // 速度值
-                  limitSpeed: "40", // 限速值
-                  carType: '危险品1', // 车辆类型
-                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
-                  gpsDateCvt: "2017-6-20 12:00", // 定位时间
-                  receiveDate: '2017-6-20 12:01' // 接收时间
-                },
-                {
-                  carId: 0, // 车辆id
-                  carPlat: '川A5434', // 车牌号
-                  carColor: '黄', // 车颜色
-                  alarmType: "凌晨2-3点", // 报警类型
-                  lng: _this.myPoint.lng + Math.random() / 100, // 纬度
-                  lat: _this.myPoint.lat - Math.random() / 1000, // 经度
-                  location: "四川省成都市都江堰市都江堰市徐渡小学西南319米", // 最新位置
-                  unitName: "网阔信息111", // 所属企业
-                  corporation: '成都王阔信息技术股份有限公司', // 所属营运商
-                  speedCvt: "60", // 速度值
-                  limitSpeed: "40", // 限速值
-                  carType: '危险品2', // 车辆类型
-                  platformName: "成都网阔信息技术股份有限公司", // 接入平台
-                  gpsDateCvt: "2017-6-20 12:00", // 定位时间
-                  receiveDate: '2017-6-20 12:01' // 接收时间
-                }
-              ]
-            };*/
-            var res = JSON.parse(res.data);
-            if (res.code == 0) {
-              if (res.data.length > 0) { // 有数据，附近有车
-                var nearData = res.data;
-                for (var i in nearData) {
-                  var option = nearData[i];
-                  console.log(option);
-                  // 拿到的经纬度要进行转换
-                  option.lng = parseFloat(option.lng) / 1000000;
-                  option.lat = parseFloat(option.lat) / 1000000;
-                  var myIcon = new BMap.Icon("./static/img/alarmCar.png", new BMap.Size(24,24));// 搜索到的车辆定位图标
-                  var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
-                  _this.map.addOverlay(marker);
-                  var html = '<div class="map-info-win"><table>' +
-                    "<tr><td>所属企业：</td><td>" + option.unitName + '</td></tr>' +
-                    "<tr><td>所属接入平台：</td><td>" + option.platformName + '</td></tr>' +
-                    '<tr><td>地址：</td><td>' + option.location + '</td></tr>' +
-                    "<tr><td>速度/限速值：</td><td>" + option.speedCvt + "/" + option.limitSpeed + ' km/h</td></tr>' +
-                    '<tr><td>报警类型：</td><td>' + option.alarmType + '</td></tr>' +
-                    '<tr><td>报警时间：</td><td>' + option.gpsDateCvt + '</td></tr>' +
-                    "</table></div>";
-                  var title = `<h2 style="font-size:14px;border-bottom: 1px solid #eee;margin-bottom: 10px;">${option.carPlat}${option.carColor}</h2>`;
-                  _this.addClickHandler(html,marker,new BMap.Point(option.lng,option.lat),title);
+          var nearData = sessionStorage.getItem('nearDataAlarmRes') && JSON.parse(JSON.parse(sessionStorage.getItem('nearDataAlarmRes'))).data;
+          if (nearData !== null && nearData.length > 0) { // 有缓存数据
+            for (var i in nearData) {
+              var option = nearData[i];
+              console.log(option);
+              // 拿到的经纬度要进行转换
+              option.lng = parseFloat(option.lng) / 1000000;
+              option.lat = parseFloat(option.lat) / 1000000;
+              var myIcon = new BMap.Icon("./static/img/alarmCar.png", new BMap.Size(24,24));// 搜索到的车辆定位图标
+              var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
+              _this.map.addOverlay(marker);
+              var html = '<div class="map-info-win"><table>' +
+                "<tr><td>所属企业：</td><td>" + option.unitName + '</td></tr>' +
+                "<tr><td>所属接入平台：</td><td>" + option.platformName + '</td></tr>' +
+                '<tr><td>地址：</td><td>' + option.location + '</td></tr>' +
+                "<tr><td>速度/限速值：</td><td>" + option.speedCvt + "/" + option.limitSpeed + ' km/h</td></tr>' +
+                '<tr><td>报警类型：</td><td>' + option.alarmType + '</td></tr>' +
+                '<tr><td>报警时间：</td><td>' + option.gpsDateCvt + '</td></tr>' +
+                "</table></div>";
+              var title = `<h2 style="font-size:14px;border-bottom: 1px solid #eee;margin-bottom: 10px;">${option.carPlat}${option.carColor}</h2>`;
+              _this.addClickHandler(html,marker,new BMap.Point(option.lng,option.lat),title);
+            }
+          }else { // 没有缓存数据
+            _this.ajaxLoader('正在加载附近报警车辆，请稍候！');
+            axios.post('/api/Vehicle/QueryAlarmVehicleInfoNear', postData).then(res => {
+              _this.ajaxComplete();
+              /*var res = {
+               "code": 0,
+               "data": [
+               {
+               carId: 0, // 车辆id
+               carPlat: '川A5434', // 车牌号
+               carColor: '红', // 车颜色
+               alarmType: "超速", // 报警类型
+               lng: _this.myPoint.lng + Math.random() / 100, // 纬度
+               lat: _this.myPoint.lat - Math.random() / 1000, // 经度
+               location: "四川省成都市都江堰市都江堰市徐渡小学西南319米", // 最新位置
+               unitName: "网阔信息111", // 所属企业
+               corporation: '成都王阔信息技术股份有限公司', // 所属营运商
+               speedCvt: "60", // 速度值
+               limitSpeed: "40", // 限速值
+               carType: '危险品1', // 车辆类型
+               platformName: "成都网阔信息技术股份有限公司", // 接入平台
+               gpsDateCvt: "2017-6-20 12:00", // 定位时间
+               receiveDate: '2017-6-20 12:01' // 接收时间
+               },
+               {
+               carId: 0, // 车辆id
+               carPlat: '川A5434', // 车牌号
+               carColor: '黄', // 车颜色
+               alarmType: "凌晨2-3点", // 报警类型
+               lng: _this.myPoint.lng + Math.random() / 100, // 纬度
+               lat: _this.myPoint.lat - Math.random() / 1000, // 经度
+               location: "四川省成都市都江堰市都江堰市徐渡小学西南319米", // 最新位置
+               unitName: "网阔信息111", // 所属企业
+               corporation: '成都王阔信息技术股份有限公司', // 所属营运商
+               speedCvt: "60", // 速度值
+               limitSpeed: "40", // 限速值
+               carType: '危险品2', // 车辆类型
+               platformName: "成都网阔信息技术股份有限公司", // 接入平台
+               gpsDateCvt: "2017-6-20 12:00", // 定位时间
+               receiveDate: '2017-6-20 12:01' // 接收时间
+               }
+               ]
+               };*/
+              sessionStorage.setItem('nearDataAlarmRes',JSON.stringify(res.data)); // 进行数据缓存
+              var res = JSON.parse(res.data);
+              if (res.code == 0) {
+                if (res.data.length > 0) { // 有数据，附近有车
+                  var nearData = res.data;
+                  for (var i in nearData) {
+                    var option = nearData[i];
+                    console.log(option);
+                    // 拿到的经纬度要进行转换
+                    option.lng = parseFloat(option.lng) / 1000000;
+                    option.lat = parseFloat(option.lat) / 1000000;
+                    var myIcon = new BMap.Icon("./static/img/alarmCar.png", new BMap.Size(24,24));// 搜索到的车辆定位图标
+                    var marker = new BMap.Marker(new BMap.Point(option.lng,option.lat),{icon:myIcon});// 创建标注
+                    _this.map.addOverlay(marker);
+                    var html = '<div class="map-info-win"><table>' +
+                      "<tr><td>所属企业：</td><td>" + option.unitName + '</td></tr>' +
+                      "<tr><td>所属接入平台：</td><td>" + option.platformName + '</td></tr>' +
+                      '<tr><td>地址：</td><td>' + option.location + '</td></tr>' +
+                      "<tr><td>速度/限速值：</td><td>" + option.speedCvt + "/" + option.limitSpeed + ' km/h</td></tr>' +
+                      '<tr><td>报警类型：</td><td>' + option.alarmType + '</td></tr>' +
+                      '<tr><td>报警时间：</td><td>' + option.gpsDateCvt + '</td></tr>' +
+                      "</table></div>";
+                    var title = `<h2 style="font-size:14px;border-bottom: 1px solid #eee;margin-bottom: 10px;">${option.carPlat}${option.carColor}</h2>`;
+                    _this.addClickHandler(html,marker,new BMap.Point(option.lng,option.lat),title);
+                  }
+                } else {
+                  alert('附近暂无报警车辆！');
                 }
               } else {
-                alert('附近暂无报警车辆！');
+                console.log(res.msg);
               }
-            } else {
-              console.log(res.msg);
-            }
-           }).catch(error => {
+            }).catch(error => {
               console.log(error);
-           });
+            });
+          }
         },
         addClickHandler (content,marker,point, title) {
           var _this = this;
