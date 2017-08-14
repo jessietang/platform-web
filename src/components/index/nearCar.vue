@@ -92,7 +92,7 @@
           car: null,
           resultList: [],
           isActive: false,
-          userInfo: this.$store.state.userInfo
+          userInfo: JSON.parse(localStorage.getItem('platformUserInfo')) || this.$store.state.userInfo
         }
       },
       created () {

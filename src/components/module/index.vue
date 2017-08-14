@@ -36,13 +36,12 @@
         return {
           zxNum: 0, // 在线平台数
           zgNum: 0, // 在岗平台数
-          platformAll: 0 // 平台总数
+          platformAll: 0, // 平台总数
+          userInfo: JSON.parse(localStorage.getItem('platformUserInfo')) || this.$store.state.userInfo
         }
       },
       computed: {
-        ...mapState([
-          'userInfo'
-        ])
+
       },
       methods: {
         // 获取页面要展示的数据

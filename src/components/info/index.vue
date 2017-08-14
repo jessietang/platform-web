@@ -36,7 +36,7 @@
       data () {
         return {
           isExitShow: false,
-          username: localStorage.getItem('platformUserName')
+          userInfo: JSON.parse(localStorage.getItem('platformUserInfo')) || this.$store.state.userInfo
         }
       },
       methods: {

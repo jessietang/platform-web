@@ -37,16 +37,15 @@
         return {
           isLoadingShow: false,
           loadingTip: '', // 加载的提示文字
-          linkData: []
+          linkData: [],
+          userInfo: JSON.parse(localStorage.getItem('platformUserInfo')) || this.$store.state.userInfo
         }
       },
       created () {
 
       },
       computed: {
-        ...mapState([
-          'userInfo'
-        ])
+
       },
       methods: {
         ajaxLoader (tip) {

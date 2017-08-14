@@ -7,7 +7,7 @@ import store from './store'
 import ElementUi from 'element-ui' // 引入ElementUi组价
 import 'element-ui/lib/theme-default/index.css'
 import axios from 'axios' // 引入axios请求
-import {fastclick} from './assets/js/common/index'
+import {fastclick, md5} from './assets/js/common/index'
 fastclick(document.body) // fastclick用于消除在移动浏览器上触发click事件与一个物理Tap(敲击)之间的300s延迟
 
 import { Picker } from 'mint-ui' //前提是npm install mint-ui --save

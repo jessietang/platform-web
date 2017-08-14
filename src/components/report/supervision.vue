@@ -16,6 +16,7 @@
     },
     data () {
       return {
+        userInfo: JSON.parse(localStorage.getItem('platformUserInfo')) || this.$store.state.userInfo,
         isLoadingShow: false,
         loadingTip: '', // 加载的提示文字
         chart: null,
@@ -29,9 +30,7 @@
       }
     },
     computed: {
-      ...mapState([
-        'userInfo'
-      ])
+
     },
     methods: {
       ajaxLoader (tip) {

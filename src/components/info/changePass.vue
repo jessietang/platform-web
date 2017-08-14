@@ -40,6 +40,7 @@
     export default {
       data () {
         return {
+          userInfo: JSON.parse(localStorage.getItem('platformUserInfo')) || this.$store.state.userInfo,
           oldPass: '',
           newPass: '',
           surePass: '',
@@ -53,9 +54,7 @@
         }
       },
       computed: {
-        ...mapState([
-          'userInfo'
-        ])
+
       },
       methods: {
         // 返回上一页

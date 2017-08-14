@@ -45,13 +45,12 @@
             enableMessage:true//设置允许信息窗发送短息
           },
           resultList: [],
-          isActive: false
+          isActive: false,
+          userInfo: JSON.parse(localStorage.getItem('platformUserInfo')) || this.$store.state.userInfo
         }
       },
       computed: {
-        ...mapState([
-          'userInfo'
-        ]),
+
       },
       methods: {
         ajaxLoader (tip) {
@@ -261,7 +260,7 @@
                 "<tr><td>所属企业：</td><td>" + option.unitName + '</td></tr>' +
                 "<tr><td>所属接入平台：</td><td>" + option.platformName + '</td></tr>' +
                 '<tr><td>地址：</td><td>' + option.location + '</td></tr>' +
-                "<tr><td>速度/限速值：</td><td>" + option.speedCvt + "/" + option.limitSpeed + ' km/h</td></tr>' +
+                "<tr><td>速度/限速值：</td><td>" + option.speedCvt / 100 + "/" + option.limitSpeed / 100 + ' km/h</td></tr>' +
                 '<tr><td>报警类型：</td><td>' + option.alarmType + '</td></tr>' +
                 '<tr><td>报警时间：</td><td>' + option.gpsDateCvt + '</td></tr>' +
                 "</table></div>";
