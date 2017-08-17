@@ -234,6 +234,8 @@
         var geolocation = new BMap.Geolocation();
         geolocation.getCurrentPosition(function(r){
           if(this.getStatus() == BMAP_STATUS_SUCCESS){
+            // 清除地图上的覆盖物
+            _this.map.clearOverlays();
             // Icon类表示覆盖物所使用的图标
             var myIcon = new BMap.Icon('./static/img/local.png',new BMap.Size(40,40));
             // Marker类表示地图上一个图像标注
