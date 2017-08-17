@@ -91,7 +91,7 @@
 
                   //重定向到首页
                   _this.$router.push({
-                    path: '/web/index/nearCar'
+                    path: '/web/index'
                   });
                 } else { // 验证不通过
                   _this.errorTip = '用户名或密码错误！';

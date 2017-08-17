@@ -4,8 +4,8 @@ var path = require('path')
 module.exports = {
   build: {
     env: require('./prod.env'),
-    index: path.resolve(__dirname, '../platformWeb/index.html'),
-    assetsRoot: path.resolve(__dirname, '../platformWeb'),
+    index: path.resolve(__dirname, '../GovMonitorPlatform/index.html'),
+    assetsRoot: path.resolve(__dirname, '../GovMonitorPlatform'),
     assetsSubDirectory: 'static',
     assetsPublicPath: './',
     productionSourceMap: true,

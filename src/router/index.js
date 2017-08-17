@@ -6,14 +6,12 @@ import VueRouter from 'vue-router'
 
 const hello = resolve => require(['../components/Hello'], resolve)
 const index = resolve => require(['../components/index/index'], resolve)
-const alarmCar = resolve => require(['../components/index/alarmCar'], resolve)
-const nearCar = resolve => require(['../components/index/nearCar'], resolve)
 const report = resolve => require(['../components/report/index'], resolve)
-const analysis = resolve => require(['../components/report/analysis'], resolve)
+const platformSupervise = resolve => require(['../components/report/platformSupervise'], resolve)
 const platformDetail = resolve => require(['../components/report/platformDetail'], resolve)
-const sixStrictBan = resolve => require(['../components/report/sixStrictBan'], resolve)
-const zxDetail = resolve => require(['../components/report/zxDetail'], resolve)
-const supervision = resolve => require(['../components/report/supervision'], resolve)
+const onlineStatus = resolve => require(['../components/report/onlineStatus'], resolve)
+const onlineDetail = resolve => require(['../components/report/onlineDetail'], resolve)
+const alarmInspector = resolve => require(['../components/report/alarmInspector'], resolve)
 const module = resolve => require(['../components/module/index'], resolve)
 const carPosition = resolve => require(['../components/index/carPosition'], resolve)
 const carTrail = resolve => require(['../components/index/carTrail'], resolve)
@@ -41,8 +39,8 @@ export default new VueRouter({
     },
     // 在线情况详情页面
     {
-      path: '/zxDetail',
-      component: zxDetail
+      path: '/onlineDetail',
+      component: onlineDetail
     },
     // 修改密码页面
     {
@@ -59,6 +57,10 @@ export default new VueRouter({
           path: 'index',
           component: index,
           children: [
+            {path: 'carPosition', component: carPosition},
+            {path: 'carTrail', component: carTrail}
+          ]
+          /*children: [
             {path: 'alarmCar', component: alarmCar},
             {
               path: 'nearCar',
@@ -68,25 +70,28 @@ export default new VueRouter({
                 {path: 'carTrail', component: carTrail}
               ]
             }
-          ]
+          ]*/
         },
         // 统计报表
         {
           path: 'report',
           component: report,
           children: [
+            // 平台监控
             {
-              path: 'analysis',
-              component: analysis,
+              path: 'platformSupervise',
+              component: platformSupervise,
               children: [
                 {path: 'platformDetail', component: platformDetail}
               ]
             },
+            // 在线情况
             {
-              path: 'sixStrictBan',
-              component: sixStrictBan
+              path: 'onlineStatus',
+              component: onlineStatus
             },
-            {path: 'supervision', component: supervision}
+            // 报警督办统计
+            {path: 'alarmInspector', component: alarmInspector}
           ]
         },
         // 模块化

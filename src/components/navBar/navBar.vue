@@ -1,10 +1,10 @@
 <template lang="html">
     <div id="navBar">
       <ul class="navBar">
-        <router-link to="/web/index/nearCar">
+        <router-link to="/web/index">
           <li class="navBarList" :class="{'activeRouter': $route.path.indexOf('/index') !== -1}"></li>
         </router-link>
-        <router-link to="/web/report/analysis">
+        <router-link to="/web/report/platformSupervise">
           <li class="navBarList" :class="{'activeRouter': $route.path.indexOf('/report') !== -1}"></li>
         </router-link>
         <router-link to="/web/module">
