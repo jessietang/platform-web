@@ -80,7 +80,7 @@ const getters = {
 
 const mutations = {
   // 保存车辆信息
-  SAVE_CAR_info: (state, carDetailObj) => {
+  SAVE_CAR_INFO: (state, carDetailObj) => {
     state.carDetail.carId = carDetailObj.carId;
     state.carDetail.carType = carDetailObj.carType;
     state.carDetail.carPlat = carDetailObj.carPlat;
@@ -95,7 +95,7 @@ const mutations = {
 
 const actions = {
   saveCarInfo: ({commit}, carDetailObj) => {
-    commit('SAVE_CAR_info', carDetailObj)
+    commit('SAVE_CAR_INFO', carDetailObj)
   },
 }
 

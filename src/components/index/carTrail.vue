@@ -71,14 +71,24 @@
             ]
           },
           isShow: true,
-          startTime: new Date(), // 开始时间 默认时间为当前时间
-          endTime: new Date(), // 结束时间 默认时间为当前时间
+          startTime: new Date(), // 开始时间 默认时间为最后一条定位时间的凌晨
+          endTime: new Date(), // 结束时间 默认时间为最后一条定位时间
           tips: '',
           tipShow: false
         }
       },
       created () {
+        console.log(this.carDetail.gpsDateCvt); // 最后一条定位时间
+        // 最后一条定位时间处理
+        var lastTimeArr = this.carDetail.gpsDateCvt.split(' ');
+        var lastD = lastTimeArr[0];
+        var lastT = lastTimeArr[1];
+        var lastDArr = lastD.split('-');
+        var lastTArr = lastT.split(':');
+        this.startTime = new Date(lastDArr[0], lastDArr[1]-1, lastDArr[2], 0, 0, 0);
+        this.endTime = new Date(lastDArr[0], lastDArr[1]-1, lastDArr[2], lastTArr[0], lastTArr[1], lastTArr[2]);
         console.log(this.startTime);
+        console.log(this.endTime);
       },
       computed: {
         ...mapState([
@@ -129,7 +139,7 @@
               _this.tipShow = true;
               _this.tips = '正在加载历史轨迹数据，请稍候！'; // 数据加载完成之前的提示，避免用户一直点
               axios.post('/api/Vehicle/QueryVehicleHistory', postData).then(res => {
-                _this.tipShow = true;
+                _this.tipShow = false;
                 var res = JSON.parse(res.data);
                 if (res.code == 0) {
                   if (res.data.length > 0) { // 有数据，有历史轨迹
