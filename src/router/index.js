@@ -19,6 +19,17 @@ const login = resolve => require(['../components/login/login'], resolve)
 const web = resolve => require(['../components/web/index'], resolve)
 const info = resolve => require(['../components/info/index'], resolve)
 const changePass = resolve => require(['../components/info/changePass'], resolve)
+const spSystem = resolve => require(['../components/spSystem/index'], resolve)
+const vehicleInfoReport = resolve => require(['../components/spSystem/vehicleInfoReport'], resolve)
+const companyCheckReport = resolve => require(['../components/spSystem/companyCheckReport'], resolve)
+const providerCheckReport = resolve => require(['../components/spSystem/providerCheckReport'], resolve)
+const VehicleTogetherReport = resolve => require(['../components/spSystem/VehicleTogetherReport'], resolve)
+const overSpeedReport = resolve => require(['../components/spSystem/overSpeedReport'], resolve)
+const abnormalReport = resolve => require(['../components/spSystem/abnormalReport'], resolve)
+const serverSupervise = resolve => require(['../components/serverSupervise/index'], resolve)
+const providerCheck = resolve => require(['../components/providerCheck/index'], resolve)
+
+
 Vue.use(VueRouter)
 
 export default new VueRouter({
@@ -103,6 +114,51 @@ export default new VueRouter({
         {
           path: 'info',
           component: info
+        },
+        // sp系统
+        {
+          path: 'spSystem',
+          component: spSystem
+        },
+        // 车辆基本信息报表
+        {
+          path: 'vehicleInfoReport',
+          component: vehicleInfoReport
+        },
+        // 企业考核统计报表
+        {
+          path: 'companyCheckReport',
+          component: companyCheckReport
+        },
+        // 服务商考核统计报表
+        {
+          path: 'providerCheckReport',
+          component: providerCheckReport
+        },
+        // 车辆汇总报表
+        {
+          path: 'VehicleTogetherReport',
+          component: VehicleTogetherReport
+        },
+        // 超速报表
+        {
+          path: 'overSpeedReport',
+          component: overSpeedReport
+        },
+        // 二至五点异常报表
+        {
+          path: 'abnormalReport',
+          component: abnormalReport
+        },
+        // 服务器监控
+        {
+          path: 'serverSupervise',
+          component: serverSupervise
+        },
+        // 服务商考核模块
+        {
+          path: 'providerCheck',
+          component: providerCheck
         }
       ]
     }

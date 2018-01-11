@@ -36,7 +36,8 @@
       data () {
         return {
           isExitShow: false,
-          userInfo: JSON.parse(localStorage.getItem('platformUserInfo')) || this.$store.state.userInfo
+          userInfo: JSON.parse(localStorage.getItem('platformUserInfo')) || this.$store.state.userInfo,
+          username: localStorage.getItem('platformUserName')
         }
       },
       methods: {
@@ -58,7 +59,9 @@
           // 跳转到首页
           _this.$router.push({
             path: '/login'
-          })
+          });
+          // close websocket
+          Gov.Thread.WS.CloseWebSocket();
         },
         exitCancel () {
           var _this = this;

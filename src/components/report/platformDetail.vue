@@ -46,7 +46,7 @@
             userId: _this.query.userId
           };
           console.log(postData);
-          axios.post('/api/Platform/QueryPlatformAlarmPlocCnt', postData).then(res => {
+          axios.post('api/Platform/QueryPlatformAlarmPlocCnt', postData).then(res => {
             // 返回数据：接入平台id, 小时， 定位数， 报警数
             /*var res = {
               "code": 0,

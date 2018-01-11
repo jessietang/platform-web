@@ -113,7 +113,7 @@
             _this.linkData = linkData;
           } else {
             _this.ajaxLoader('数据正在加载中，请稍候！');
-            axios.post('/api/Platform/QueryPlatformSupervise', postData).then(res => {
+            axios.post('api/Platform/QueryPlatformSupervise', postData).then(res => {
               _this.ajaxComplete();
               // 返回数据：接入平台id, 接入平台，主链路通断情况、从链路通断情况
               /*var res = {

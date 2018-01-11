@@ -138,7 +138,7 @@
               };
               _this.tipShow = true;
               _this.tips = '正在加载历史轨迹数据，请稍候！'; // 数据加载完成之前的提示，避免用户一直点
-              axios.post('/api/Vehicle/QueryVehicleHistory', postData).then(res => {
+              axios.post('api/Vehicle/QueryVehicleHistory', postData).then(res => {
                 _this.tipShow = false;
                 var res = JSON.parse(res.data);
                 if (res.code == 0) {

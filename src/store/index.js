@@ -3,6 +3,7 @@
  */
 import Vue from 'vue'
 import Vuex from 'vuex'
+import axios from 'axios'
 
 Vue.use(Vuex)
 
@@ -71,7 +72,11 @@ const state = {
       direction: './static/img/d8.png',
       dot: './static/img/icon8.png'
     }
-  ]
+  ],
+  unitOptions: JSON.parse(sessionStorage.getItem('unitOptions')),
+  zoneOptions: JSON.parse(sessionStorage.getItem('zoneOptions')),
+  providerOptions: JSON.parse(sessionStorage.getItem('providerOptions')),
+  deviceTypeOptions: JSON.parse(sessionStorage.getItem('deviceTypeOptions')),
 }
 
 const getters = {
@@ -90,6 +95,30 @@ const mutations = {
     state.carDetail.location = carDetailObj.location;
     state.carDetail.corporation = carDetailObj.corporation;
     state.carDetail.gpsDateCvt = carDetailObj.gpsDateCvt;
+  },
+  GET_UNIT_OPTIONS: (state, unitOptions) => {
+    //state.unitOptions = unitOptions;
+    // 保存在localStorage里面，防止刷新浏览器vuex数据消失
+    if (!sessionStorage.getItem('unitOptions')) {
+      sessionStorage.setItem('unitOptions', JSON.stringify(unitOptions))
+    }
+  },
+  GET_ZONE_OPTIONS: (state, zoneOptions) => {
+    //state.zoneOptions = zoneOptions;
+    if (!sessionStorage.getItem('zoneOptions')) {
+      sessionStorage.setItem('zoneOptions', JSON.stringify(zoneOptions))
+    }
+  },
+  GET_PROVIDER_OPTIONS: (state, providerOptions) => {
+    //state.providerOptions = providerOptions;
+    if (!sessionStorage.getItem('providerOptions')) {
+      sessionStorage.setItem('providerOptions', JSON.stringify(providerOptions))
+    }
+  },
+  GET_DEVICE_TYPE_OPTIONS: (state, deviceTypeOptions) => {
+    if (!sessionStorage.getItem('deviceTypeOptions')) {
+      sessionStorage.setItem('deviceTypeOptions', JSON.stringify(deviceTypeOptions))
+    }
   }
 }
 
@@ -97,6 +126,56 @@ const actions = {
   saveCarInfo: ({commit}, carDetailObj) => {
     commit('SAVE_CAR_INFO', carDetailObj)
   },
+  // 获取运输企业数据
+  getOptions: ({commit}) => {
+    var postData = {
+      text: '川',
+      type: 1002, // 车的类型
+      userId: 2246
+    };
+
+    // need to do...
+    // 获取运输企业数据
+    var unitOptions = [];
+    axios.get('api/autocomplete',{params: postData}).then(res => {
+      unitOptions = [
+        {label: '成都富临长运集团有限公司', value: '1001'},
+        {label: '四川东方龙运业有限公司', value: '3519'},
+        {label: '四川省汽车运输成都公司', value: '3520'},
+      ];
+      commit('GET_UNIT_OPTIONS', unitOptions)
+    });
+    // 获取所属地区数据
+    var zoneOptions = [];
+    axios.get('api/autocomplete',{params: postData}).then(res => {
+      zoneOptions = [
+        {label: '四川省', value: '51000000'},
+        {label: '成都市', value: '51010000'},
+        {label: '自贡市', value: '51030000'},
+      ];
+      commit('GET_ZONE_OPTIONS', zoneOptions)
+    });
+    // 获取服务商数据
+    var providerOptions = [];
+    axios.get('api/autocomplete',{params: postData}).then(res => {
+      providerOptions = [
+        {label: '巴中市伊爱科贸有限责任公司', value: '1'},
+        {label: '北京中交兴路信息科技有限公司四川分公司', value: '2'},
+        {label: '成都安彩敬天科技有限公司', value: '3'},
+      ];
+      commit('GET_PROVIDER_OPTIONS', providerOptions)
+    });
+    // 获取终端型号数据
+    var deviceTypeOptions = [];
+    axios.get('api/autocomplete',{params: postData}).then(res => {
+      deviceTypeOptions = [
+        {label: 'ZD-V02H', value: '1'},
+        {label: '中软北斗I型', value: '2'},
+        {label: 'ZD-V01H', value: '3'},
+      ];
+      commit('GET_DEVICE_TYPE_OPTIONS', deviceTypeOptions)
+    });
+  }
 }
 
 export default new Vuex.Store({

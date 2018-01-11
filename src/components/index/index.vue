@@ -204,7 +204,7 @@
         };
         console.log(postData);
         // 发get请求 （这里要注意传参的方式，通过params对象传递参数）
-        axios.get('/api/autocomplete',{params: postData}).then(res => {
+        axios.get('api/autocomplete',{params: postData}).then(res => {
           var res = JSON.parse(res.data);
           console.log(res);
           var resultList = res.data;
@@ -307,7 +307,7 @@
           }
         } else { // 无缓存，重新请求数据
           _this.ajaxLoader('正在加载附近车辆，请稍候！');
-          axios.post('/api/Vehicle/QueryVehicleInfoNear', postData).then(res => {
+          axios.post('api/Vehicle/QueryVehicleInfoNear', postData).then(res => {
             _this.ajaxComplete();
             console.log(res);
             // 只在用户选定的位置是用户的定位位置的时候进行数据缓存
@@ -389,7 +389,7 @@
           }
         }else { // 没有缓存数据
           _this.ajaxLoader('正在加载附近报警车辆，请稍候！');
-          axios.post('/api/Vehicle/QueryAlarmVehicleInfoNear', postData).then(res => {
+          axios.post('api/Vehicle/QueryAlarmVehicleInfoNear', postData).then(res => {
             _this.ajaxComplete();
             // 只在用户选定的位置是用户的定位位置的时候进行数据缓存
             if (_this.myPoint.lat == _this.mySelectPoint.lat && _this.myPoint.lng == _this.mySelectPoint.lng) {
@@ -464,7 +464,7 @@
         console.log(postData);
 
         if (_this.isNearTab) { // 当前是附近车的精准搜索（不同接口）
-          axios.post('/api/Vehicle/QueryVehicleInfo',postData).then(res => {
+          axios.post('api/Vehicle/QueryVehicleInfo',postData).then(res => {
             var res = JSON.parse(res.data);
             if (res.code == 0) {
               if (res.data.length == 1) {
@@ -524,7 +524,7 @@
         }
 
         if (_this.isAlarmTab) { // 当前是报警车的精准搜索（不同接口）
-          axios.post('/api/Vehicle/QueryAlarmVehicleInfo', postData).then(res => {
+          axios.post('api/Vehicle/QueryAlarmVehicleInfo', postData).then(res => {
             var res = JSON.parse(res.data);
             if (res.code == 0) {
               if (res.data.length == 1) { // 有数据，搜索有结果

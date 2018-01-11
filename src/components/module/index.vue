@@ -1,11 +1,47 @@
 <template lang="html">
     <div id="moduleIndex">
-      <!--<p class="title">模块化管理</p>-->
       <div class="modularBox clearfix">
-        <div class="modularList"><img src="./img/modular1.png" alt=""/></div>
-        <div class="modularList"><img src="./img/modular2.png" alt=""/></div>
-        <div class="modularList"><img src="./img/modular3.png" alt=""/></div>
-        <div class="modularList"><img src="./img/modular4.png" alt=""/></div>
+        <div class="block">
+          <el-carousel trigger="click" :autoplay="false">
+            <el-carousel-item>
+              <div class="modularList" @click="goServerSupervise()">
+                <img src="./img/serverSupervise.png" />
+                <span>服务器监控</span>
+              </div>
+              <div class="modularList" @click="goSp()">
+                <img src="./img/modular2.png" alt="sp系统"/>
+                <span>SP系统</span>
+              </div>
+              <div class="modularList">
+                <img src="./img/modular4.png" />
+                <span>统计分析</span>
+              </div>
+              <div class="modularList" @click="goProviderCheck()">
+                <img src="./img/providerCheck.png" />
+                <span>服务商考核</span>
+              </div>
+            </el-carousel-item>
+            <el-carousel-item>
+              <div class="modularList">
+                <img src="./img/serverSupervise.png" alt=""/>
+                <span>服务器监控</span>
+              </div>
+              <div class="modularList">
+                <img src="./img/serverSupervise.png" alt=""/>
+                <span>服务器监控</span>
+              </div>
+              <div class="modularList">
+                <img src="./img/serverSupervise.png" alt=""/>
+                <span>服务器监控</span>
+              </div>
+              <div class="modularList">
+                <img src="./img/serverSupervise.png" alt=""/>
+                <span>服务器监控</span>
+              </div>
+            </el-carousel-item>
+          </el-carousel>
+        </div>
+
       </div>
 
       <div class="modularBottom">
@@ -51,7 +87,7 @@
           var postData = {
             userId: _this.userInfo.userId
           };
-          axios.post('/api/Industry/QueryIndustryCount',postData).then(res => {
+          axios.post('api/Industry/QueryIndustryCount',postData).then(res => {
             /*var res = {
               "code": 0,
               "data": [
@@ -80,6 +116,24 @@
           }).catch(error => {
             console.log(error);
           });
+        },
+        // sp系统模块
+        goSp () {
+          this.$router.push({
+            path: '/web/spSystem'
+          });
+        },
+        // 服务器监控模块
+        goServerSupervise  () {
+          this.$router.push({
+            path: '/web/serverSupervise'
+          });
+        },
+        // 服务商考核数据
+        goProviderCheck () {
+          this.$router.push({
+            path: '/web/providerCheck'
+          })
         }
 
       },
@@ -90,7 +144,7 @@
       }
     }
 </script>
-<style lang="scss" scoped="" type="text/css">
+<style lang="scss" type="text/css">
   @import '../../assets/scss/mixin.scss';
   @import '../../assets/scss/flexmixin.scss';
   @import '../../assets/scss/base.scss';
@@ -104,17 +158,41 @@
       @include pxrem(height,400);
       border: 1px solid #eee;
 
+      .block {
+        width: 100%;
+        @include pxrem(height,400);
+
+        .el-carousel, .el-carousel__container, .el-carousel__item {
+          width: 100%;
+          @include pxrem(height,400);
+        }
+
+        .el-carousel__container > button {
+          display: none;
+        }
+
+        .el-carousel__button {
+          background-color: #0a72a9;
+        }
+      }
+
       .modularList {
         float: left;
         width: 50%;
         @include pxrem(height,200);
         @include pxrem(line-height,200);
-        text-align: center;
 
         img {
           @include pxrem(width,67);
           @include pxrem(height,67);
           vertical-align: middle;
+          @include pxrem(margin-left, 50);
+          @include pxrem(margin-right, 20);
+        }
+
+        span {
+          @include pxrem(font-size, 30);
+          color: #1296db;
         }
       }
 

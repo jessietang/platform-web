@@ -136,7 +136,7 @@
           _this.drawPie('supervisionReport');
         } else {
           _this.ajaxLoader('数据正在加载中,请稍候！');
-          axios.post('/api/Supervise/QueryAlarmSupervisionCount', postData).then(res => {
+          axios.post('api/Supervise/QueryAlarmSupervisionCount', postData).then(res => {
             _this.ajaxComplete();
             /*var res = {
              "code": 0,

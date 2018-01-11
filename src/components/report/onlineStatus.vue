@@ -231,7 +231,7 @@
           });
         } else {
           _this.ajaxLoader('数据正在加载中,请稍候！');
-          axios.post('/api/Online/QueryOnlineTotal', postData).then(res => {
+          axios.post('api/Online/QueryOnlineTotal', postData).then(res => {
             // 返回数据：
             // 1根据展示方式，返回地区ID、服务商ID、企业ID
             // 2根据展示方式，返回地区名称、服务商名称、企业名称

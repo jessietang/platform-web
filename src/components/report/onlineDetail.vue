@@ -53,7 +53,7 @@
             nowSelect: nowSelect,
             userId: userId
           };
-          axios.post('/api/Online/QueryOnlineDetail',postData).then(res => {
+          axios.post('api/Online/QueryOnlineDetail',postData).then(res => {
             // 返回数据：选择项id、车辆类型、在线数、入网数、车辆总数
             /*var res = {
               "code": 0,

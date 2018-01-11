@@ -61,7 +61,7 @@
               password: _this.password
             };
             console.log(postData);
-            axios.post('/api/Account/Login',postData).then(res => {
+            axios.post('api/Account/Login',postData).then(res => {
               /*var res = {
                 "code": 0,
                 "data": [{"userId": "123", "zoneId": "1111"}]
@@ -71,7 +71,7 @@
                 if (res.data.length > 0) { // 验证通过
                   var data = res.data;
                   localStorage.setItem('platformUserName', username);
-                  sessionStorage.setItem('platformPassword', password);
+                  sessionStorage.setItem('platformPassword', _this.password);
                   console.log(localStorage.getItem('platformUserName'));
                   // 拿到userId,zoneId 保存在store里面
                   var userId = data[0].userId;
@@ -88,6 +88,11 @@
 
                   // 保存登录状态
                   localStorage.setItem('platformLoginState', true);
+
+                  sessionStorage.name = username;
+                  sessionStorage.Pwd = _this.password;
+                  sessionStorage.userId = userId;
+                  sessionStorage.zoneId = zoneId;
 
                   //重定向到首页
                   _this.$router.push({

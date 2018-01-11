@@ -106,7 +106,7 @@
                   {"cState": 102, "tips": "您的旧密码不对，请重新填写！", newPass: '123'}
                 ]
               };*/
-              axios.post('/api/Account/UpdateUserLoginPass', postData).then(res => {
+              axios.post('api/Account/UpdateUserLoginPass', postData).then(res => {
                 var res = JSON.parse(res.data);
                 if (res.code == 0) {
                   if (res.data[0].cState == 101) { // 修改成功
