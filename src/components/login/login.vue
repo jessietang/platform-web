@@ -69,7 +69,7 @@
             });*/
 
             /*==在本地可以直接这样请求（chrome浏览器也可以不用配置 --disable-web-security属性），
-            因为俊杰兄在服务端配置了cors跨域资源共享，所以这里还会有两个请求，第一个是预检请求，请求方式是OPTIONS，
+            因为俊杰兄在服务端配置了cors跨域资源共享，所以这里在本地开发的时候还会有两个请求，第一个是预检请求，请求方式是OPTIONS，
             第二个请求是正式的xmlhttprequest请求==*/
             axios.post('api/Account/Login',postData).then(res => {
               /*var res = {
