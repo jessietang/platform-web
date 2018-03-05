@@ -13,7 +13,7 @@
         </div>
         <div class="input-box pw-box">
           <img src="./img/pw.png" alt="" class="login-input-icon"/>
-          <input type="password" class="pw" placeholder="请输入密码" v-model="password"/>
+          <input type="password" class="pw" placeholder="请输入密码" v-model="password" @keyup.enter="doLogin()"/>
         </div>
         <a class="login-btn" id="button" name="button" @click="doLogin()">登 &nbsp;&nbsp; 录</a>
       </div>
