@@ -23,10 +23,10 @@ module.exports = {
   },
   dev: {
     env: require('./dev.env'),
-    port: 8080,
+    port: 8081,
     autoOpenBrowser: true,
     assetsSubDirectory: 'static', // // 编译输出的二级目录
-    assetsPublicPath: './', // 编译发布的根目录，可配置为资源服务器域名或 CDN 域名
+    assetsPublicPath: '/', // 编译发布的根目录，可配置为资源服务器域名或 CDN 域名
     // 跨域设置(只适用于开发环境)
     proxyTable: {
       '/api': {
@@ -34,6 +34,13 @@ module.exports = {
         changeOrigin: true,
         pathRewrite: {
           '^/api': '/'
+        }
+      },
+      '/test': {
+        target: 'http://125.71.30.136', // 这里我们一般是在本地开发的时候，配置测试环境的，而不是正式环境的
+        changeOrigin: true,
+        pathRewrite: {
+          '^/test': '/AppWebApi/api'  // 本地访问localhost:port/test/... 都会用代理去访问，变成： http://125.71.30.136/AppWebApi/api/...
         }
       }
     },

@@ -61,6 +61,16 @@
               password: _this.password
             };
             console.log(postData);
+            /*==如果服务端没有配置cors跨域资源共享，那就用这种自定义代理配置（config/index.js），
+            不去用设置chrome浏览器--disable-web-security属性的方式
+            而且这个时候，就不要去设置main.js里面的 axios.defaults.baseURL 了==*/
+            /*axios.post('/test/Account/Login',postData).then(res => {
+              console.log(res);
+            });*/
+
+            /*==在本地可以直接这样请求（chrome浏览器也可以不用配置 --disable-web-security属性），
+            因为俊杰兄在服务端配置了cors跨域资源共享，所以这里还会有两个请求，第一个是预检请求，请求方式是OPTIONS，
+            第二个请求是正式的xmlhttprequest请求==*/
             axios.post('api/Account/Login',postData).then(res => {
               /*var res = {
                 "code": 0,
