@@ -30,10 +30,10 @@ module.exports = {
     // 跨域设置(只适用于开发环境)
     proxyTable: {
       '/api': {
-        target: 'http://125.71.30.136/AppWebApi/',
+        target: 'http://125.71.30.136',
         changeOrigin: true,
         pathRewrite: {
-          '^/api': '/'
+          '^/api': '/api'
         }
       },
       '/test': {
